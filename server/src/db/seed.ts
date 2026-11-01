@@ -44,7 +44,7 @@ const sampleExpenses: SampleExpense[] = [
   { daysAgo: 12, amountMinor: 220_000, categoryId: 6, note: 'Birthday gift' },
   { daysAgo: 8, amountMinor: 380_000, categoryId: 1, note: 'Groceries' },
   { daysAgo: 4, amountMinor: 60_000, categoryId: 2, note: 'Bus card top-up' },
-  { daysAgo: 1, amountMinor: 200_000, categoryId: 5, note: 'Bowling night' },
+  { daysAgo: 0, amountMinor: 200_000, categoryId: 5, note: 'Bowling night' },
 ];
 
 export function seedCategories(db: DatabaseSync): void {
@@ -56,7 +56,7 @@ export function seedCategories(db: DatabaseSync): void {
 
 /**
  * Inserts the sample expenses into a new database.
- * Dates are relative to `today` (0 to 57 days before it), so none is in the future.
+ * Dates are relative to `today` (0 to 57 days before it): none is in the future and at least one is today, so the current month is never empty.
  */
 export function seedSampleExpenses(db: DatabaseSync, today: Date = new Date()): void {
   const insert = db.prepare(
