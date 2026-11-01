@@ -1,0 +1,26 @@
+{
+  "name": "spendly",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Personal expense tracker: React web app, Express REST API, SQLite.",
+  "type": "module",
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "concurrently --names api,web --prefix-colors blue,green \"npm run dev --workspace server\" \"npm run dev --workspace web\"",
+    "test": "npm test --workspaces",
+    "lint": "tsc --noEmit -p tsconfig.json && npm run lint --workspaces",
+    "db:reset": "npm run db:reset --workspace server"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^24.19.2",
+    "concurrently": "^10.0.6",
+    "typescript": "^5.9.3"
+  }
+}

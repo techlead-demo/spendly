@@ -1,0 +1,55 @@
+/*
+ * Spendly design tokens. Used by the static mockups in screens/ and imported by the web app
+ * (web/src/styles/global.css). Use these variables instead of literal colours, sizes or fonts.
+ */
+:root {
+  /* Colours */
+  --color-bg: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f3f6;
+  --color-border: #e3e6eb;
+  --color-border-strong: #c9ced6;
+  --color-text: #1d2433;
+  --color-text-muted: #5f6b7a;
+  --color-primary: #1f7a5c;
+  --color-primary-hover: #17614a;
+  --color-on-primary: #ffffff;
+  --color-focus: #4c9ffe;
+  --color-danger: #c0392b;
+  --color-danger-bg: #fdecea;
+  --color-warning: #8a5a00;
+  --color-warning-bg: #fff4d6;
+  --color-warning-border: #f2c94c;
+  --color-success: #1f7a5c;
+  --color-success-bg: #e5f4ee;
+
+
+  /* Spacing (4px scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-size-sm: 13px;
+  --font-size-md: 15px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 650;
+  --line-height: 1.5;
+
+  /* Shape */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+
+  /* Layout */
+  --header-height: 56px;
+  --content-max-width: 960px;
+  --control-height: 36px;
+}

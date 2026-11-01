@@ -1,0 +1,86 @@
+<!doctype html>
+<!-- Static mockup. Layout, text and states are the design; the data is illustrative. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spendly mockup: Categories</title>
+  <link rel="stylesheet" href="../tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family); font-size: var(--font-size-md); line-height: var(--line-height); color: var(--color-text); background: var(--color-bg); }
+    button, input, select, textarea { font: inherit; }
+    .header { display: flex; align-items: center; gap: var(--space-6); height: var(--header-height); padding: 0 var(--space-6); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .brand { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-primary); }
+    .nav { display: flex; gap: var(--space-4); }
+    .nav a { color: var(--color-text-muted); text-decoration: none; padding: var(--space-2) 0; }
+    .nav a.active { color: var(--color-text); font-weight: var(--font-weight-medium); border-bottom: 2px solid var(--color-primary); }
+    .main { max-width: var(--content-max-width); margin: 0 auto; padding: var(--space-6); }
+    .titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    h1 { margin: 0; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .field { display: flex; flex-direction: column; gap: var(--space-1); }
+    .label { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .control { height: var(--control-height); padding: 0 var(--space-3); color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); }
+    .control.invalid { border-color: var(--color-danger); }
+    textarea.control { height: auto; padding: var(--space-2) var(--space-3); resize: vertical; }
+    .fieldError { font-size: var(--font-size-sm); color: var(--color-danger); }
+    .hint { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .button { height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+    .button.primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
+    .button.danger { border-color: var(--color-danger); color: var(--color-danger); }
+    .link { color: var(--color-primary); text-decoration: none; background: none; border: none; padding: 0; cursor: pointer; }
+    .table { width: 100%; border-collapse: collapse; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .table th, .table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--color-border); }
+    .table th { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-muted); background: var(--color-surface-muted); }
+    .table tbody tr:last-child td { border-bottom: none; }
+    .table tfoot td { font-weight: var(--font-weight-bold); background: var(--color-surface-muted); border-bottom: none; border-top: 1px solid var(--color-border); }
+    .num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .muted { color: var(--color-text-muted); }
+    .total { display: flex; justify-content: flex-end; gap: var(--space-4); padding: var(--space-4); font-size: var(--font-size-lg); }
+    .total strong { font-variant-numeric: tabular-nums; }
+    .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-6); }
+    .banner { display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); border-radius: var(--radius-sm); border: 1px solid; }
+    .banner.warning { color: var(--color-warning); background: var(--color-warning-bg); border-color: var(--color-warning-border); }
+    .banner.error { color: var(--color-danger); background: var(--color-danger-bg); border-color: var(--color-danger); }
+    .banner ul { margin: var(--space-1) 0 0; padding-left: var(--space-5); }
+    .badge { display: inline-block; padding: 0 var(--space-2); font-size: var(--font-size-sm); border-radius: var(--radius-sm); }
+    .badge.active { color: var(--color-success); background: var(--color-success-bg); }
+    .badge.retired { color: var(--color-text-muted); background: var(--color-surface-muted); }
+    .mockupNote { max-width: var(--content-max-width); margin: 0 auto; padding: 0 var(--space-6) var(--space-6); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <span class="brand">Spendly</span>
+    <nav class="nav">
+      <a href="expense-list.html">Expenses</a>
+      <a href="monthly-summary.html">Summary</a>
+      <a href="categories.html" class="active">Categories</a>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="titleRow"><h1>Categories</h1></div>
+    <form class="toolbar">
+      <label class="field" style="flex:1;max-width:320px"><span class="label">New category</span><input class="control" placeholder="e.g. Pets" maxlength="40" /></label>
+      <button class="button primary" type="submit">Add category</button>
+    </form>
+    <table class="table">
+      <thead>
+        <tr><th>Name</th><th class="num">Expenses</th><th>Status</th><th class="num"></th></tr>
+      </thead>
+      <tbody>
+          <tr><td>Food</td><td class="num">48</td><td><span class="badge active">Active</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Retire</button></td></tr>
+          <tr><td>Transport</td><td class="num">31</td><td><span class="badge active">Active</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Retire</button></td></tr>
+          <tr><td>Housing</td><td class="num">12</td><td><span class="badge active">Active</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Retire</button></td></tr>
+          <tr><td>Health</td><td class="num">7</td><td><span class="badge active">Active</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Retire</button></td></tr>
+          <tr><td>Entertainment</td><td class="num">15</td><td><span class="badge active">Active</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Retire</button></td></tr>
+          <tr><td>Other</td><td class="num">9</td><td><span class="badge active">Active</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Retire</button></td></tr>
+          <tr><td>Coffee</td><td class="num">22</td><td><span class="badge active">Active</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Retire</button></td></tr>
+          <tr><td>Gym</td><td class="num">6</td><td><span class="badge retired">Retired</span></td><td class="num"><button class="link" type="button">Rename</button> · <button class="link" type="button">Restore</button></td></tr>
+      </tbody>
+    </table>
+  </main>
+  <p class="mockupNote">Categories: active categories first, then retired ones. Rename turns the name cell into an input with Save / Cancel. Retired categories are not offered in the add/edit expense form but still appear on existing expenses.</p>
+</body>
+</html>

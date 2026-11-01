@@ -1,0 +1,105 @@
+<!doctype html>
+<!-- Static mockup. Layout, text and states are the design; the data is illustrative. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spendly mockup: Expense list</title>
+  <link rel="stylesheet" href="../tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family); font-size: var(--font-size-md); line-height: var(--line-height); color: var(--color-text); background: var(--color-bg); }
+    button, input, select, textarea { font: inherit; }
+    .header { display: flex; align-items: center; gap: var(--space-6); height: var(--header-height); padding: 0 var(--space-6); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .brand { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-primary); }
+    .nav { display: flex; gap: var(--space-4); }
+    .nav a { color: var(--color-text-muted); text-decoration: none; padding: var(--space-2) 0; }
+    .nav a.active { color: var(--color-text); font-weight: var(--font-weight-medium); border-bottom: 2px solid var(--color-primary); }
+    .main { max-width: var(--content-max-width); margin: 0 auto; padding: var(--space-6); }
+    .titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    h1 { margin: 0; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .field { display: flex; flex-direction: column; gap: var(--space-1); }
+    .label { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .control { height: var(--control-height); padding: 0 var(--space-3); color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); }
+    .control.invalid { border-color: var(--color-danger); }
+    textarea.control { height: auto; padding: var(--space-2) var(--space-3); resize: vertical; }
+    .fieldError { font-size: var(--font-size-sm); color: var(--color-danger); }
+    .hint { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .button { height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+    .button.primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
+    .button.danger { border-color: var(--color-danger); color: var(--color-danger); }
+    .link { color: var(--color-primary); text-decoration: none; background: none; border: none; padding: 0; cursor: pointer; }
+    .table { width: 100%; border-collapse: collapse; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .table th, .table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--color-border); }
+    .table th { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-muted); background: var(--color-surface-muted); }
+    .table tbody tr:last-child td { border-bottom: none; }
+    .table tfoot td { font-weight: var(--font-weight-bold); background: var(--color-surface-muted); border-bottom: none; border-top: 1px solid var(--color-border); }
+    .num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .muted { color: var(--color-text-muted); }
+    .total { display: flex; justify-content: flex-end; gap: var(--space-4); padding: var(--space-4); font-size: var(--font-size-lg); }
+    .total strong { font-variant-numeric: tabular-nums; }
+    .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-6); }
+    .banner { display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); border-radius: var(--radius-sm); border: 1px solid; }
+    .banner.warning { color: var(--color-warning); background: var(--color-warning-bg); border-color: var(--color-warning-border); }
+    .banner.error { color: var(--color-danger); background: var(--color-danger-bg); border-color: var(--color-danger); }
+    .banner ul { margin: var(--space-1) 0 0; padding-left: var(--space-5); }
+    .badge { display: inline-block; padding: 0 var(--space-2); font-size: var(--font-size-sm); border-radius: var(--radius-sm); }
+    .badge.active { color: var(--color-success); background: var(--color-success-bg); }
+    .badge.retired { color: var(--color-text-muted); background: var(--color-surface-muted); }
+    .mockupNote { max-width: var(--content-max-width); margin: 0 auto; padding: 0 var(--space-6) var(--space-6); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <span class="brand">Spendly</span>
+    <nav class="nav">
+      <a href="expense-list.html" class="active">Expenses</a>
+      <a href="monthly-summary.html">Summary</a>
+      <a href="categories.html">Categories</a>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="titleRow">
+      <h1>Expenses</h1>
+      <a class="button primary" href="expense-form.html" style="display:inline-flex;align-items:center;text-decoration:none">Add expense</a>
+    </div>
+
+    <div class="toolbar">
+      <label class="field"><span class="label">Month</span><input class="control" type="month" value="2026-11" /></label>
+      <label class="field"><span class="label">Category</span>
+        <select class="control"><option>All categories</option><option>Food</option><option>Transport</option><option>Housing</option><option>Health</option><option>Entertainment</option><option>Other</option></select>
+      </label>
+    </div>
+
+    <form class="toolbar" role="search">
+      <label class="field" style="flex:1;min-width:220px"><span class="label">Search notes</span><input class="control" type="search" placeholder="e.g. groceries" /></label>
+      <label class="field"><span class="label">Min amount (₫)</span><input class="control" inputmode="numeric" placeholder="0" style="width:140px" /></label>
+      <label class="field"><span class="label">Max amount (₫)</span><input class="control" inputmode="numeric" placeholder="Any" style="width:140px" /></label>
+      <button class="button" type="button">Clear</button>
+    </form>
+
+    <table class="table">
+      <thead>
+        <tr><th>Date</th><th>Category</th><th>Note</th><th class="num">Amount</th><th class="num"></th></tr>
+      </thead>
+      <tbody>
+          <tr><td>21/11/2026</td><td>Entertainment</td><td class="muted">Bowling night</td><td class="num">200.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>18/11/2026</td><td>Transport</td><td class="muted">Bus card top-up</td><td class="num">60.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>15/11/2026</td><td>Food</td><td class="muted">Groceries</td><td class="num">380.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>13/11/2026</td><td>Other</td><td class="muted">Birthday gift</td><td class="num">220.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>10/11/2026</td><td>Health</td><td class="muted">Vitamins</td><td class="num">75.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>08/11/2026</td><td>Transport</td><td class="muted">Fuel</td><td class="num">100.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>06/11/2026</td><td>Food</td><td class="muted">Pho with friends</td><td class="num">95.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>04/11/2026</td><td>Entertainment</td><td class="muted">Streaming subscription</td><td class="num">150.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>03/11/2026</td><td>Food</td><td class="muted">Coffee</td><td class="num">30.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>02/11/2026</td><td>Food</td><td class="muted">Groceries at Co.opmart</td><td class="num">280.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>01/11/2026</td><td>Transport</td><td class="muted"></td><td class="num">40.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+          <tr><td>01/11/2026</td><td>Housing</td><td class="muted">Monthly rent</td><td class="num">6.500.000 ₫</td><td class="num"><a class="link" href="expense-form-edit.html">Edit</a></td></tr>
+      </tbody>
+    </table>
+    <div class="total"><span>Month total</span><strong>8.130.000 ₫</strong></div>
+  </main>
+  <p class="mockupNote">Expense list, default state: current month, all categories, no search. Empty month: the table is replaced by "No expenses for this month." and the month total shows 0 ₫. Search with no match: "No expenses match your search."</p>
+</body>
+</html>

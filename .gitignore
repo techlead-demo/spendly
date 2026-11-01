@@ -1,0 +1,20 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+
+# Local SQLite database (see project-context/runbook.md)
+server/data/*.db
+server/data/*.db-*
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Environment and editor files
+.env
+.env.*
+.DS_Store
+*.log
