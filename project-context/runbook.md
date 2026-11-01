@@ -61,3 +61,4 @@ Deletes the file at `DB_PATH` (default `server/data/spendly.db`) and recreates i
 | Playwright: `Executable doesn't exist` | `npx playwright install chromium`. |
 | `node:sqlite` not found | Node is older than 24: switch to Node 24. |
 | `npm test` fails with `Cannot find module` after pulling | Dependencies changed: run `npm ci`. |
+| An e2e test fails | Run it alone: `npx playwright test e2e/<file>`; screenshots and traces are in `test-results/`. |
