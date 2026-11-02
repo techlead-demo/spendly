@@ -116,11 +116,14 @@ test.describe('categories', () => {
     await expect(rowWith(page, renamed).getByRole('cell')).toHaveText([renamed, '1', 'Active', 'Rename · Retire']);
 
     await page.getByRole('navigation').getByRole('link', { name: 'Expenses' }).click();
+    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
     await page.getByLabel('Month').fill('2026-10');
     await expect(rowWith(page, note).getByRole('cell').nth(1)).toHaveText(renamed);
     expect(await categoryOptions(page)).toContain(renamed);
 
+    // Wait for the Summary screen so the month is not typed into the list's Month field before it unmounts.
     await page.getByRole('navigation').getByRole('link', { name: 'Summary' }).click();
+    await expect(page.getByRole('heading', { name: 'Summary' })).toBeVisible();
     await page.getByLabel('Month').fill('2026-10');
     await expect(rowWith(page, renamed)).toBeVisible();
   });
@@ -144,6 +147,7 @@ test.describe('categories', () => {
 
     // AC-20: still listed and offered by the category filter (the month total is covered by the API tests).
     await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
     await page.getByLabel('Month').fill('2026-10');
     await expect(rowWith(page, note).getByRole('cell').nth(1)).toHaveText(name);
     await page.getByLabel('Category').selectOption({ label: name });
@@ -152,6 +156,7 @@ test.describe('categories', () => {
 
     // AC-21: still a row in the monthly summary.
     await page.goto('/#/summary');
+    await expect(page.getByRole('heading', { name: 'Summary' })).toBeVisible();
     await page.getByLabel('Month').fill('2026-10');
     await expect(rowWith(page, name)).toContainText('1');
 

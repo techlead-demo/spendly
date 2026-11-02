@@ -1,7 +1,7 @@
 ---
 issue: SPD-6
 spec_version: 3
-revision: 0
+revision: 2
 ---
 
 # Implementation plan — SPD-6
@@ -72,3 +72,10 @@ KEY`; categories are never deleted, so ids are never reused. `data-model.md` upd
   It is covered by the API and component tests.
 - Web `Category` gains `status` and `expenseCount`; test fixtures are updated accordingly.
 - `project-context/business/overview.md` is not changed (out of scope per the spec).
+
+## Revision 2
+| Feedback item | Resolution |
+|---|---|
+| AI review nit + admin Jira comment: stale SPD-2/SPD-4 header test titles in `web/src/App.test.tsx` | Fixed: both titles now name Expenses, Summary, Budgets and Categories. Rechecked all other header/link test titles in `web/src` and `e2e`; none lists the links by name. |
+| AI review nit: Rename stays enabled while a save is in flight (`CategoriesPage.tsx`) | Fixed: Rename is disabled while busy, like Retire/Restore; new test in `CategoriesPage.test.tsx`. |
+| Found while running the checks: `e2e/categories.spec.ts` AC-13 was flaky (the month was typed into the previous screen's Month field before the Summary screen rendered) | Fixed: the e2e journeys wait for the target screen's heading before filling the Month field. |
