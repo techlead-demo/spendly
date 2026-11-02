@@ -19,8 +19,9 @@ export interface AppOptions {
 /** Builds the Express app on top of an open database. Tests call this with an in-memory database. */
 export function createApp(db: DatabaseSync, { now = () => new Date() }: AppOptions = {}): express.Express {
   const categories = createCategoryRepository(db);
-  const expenses = createExpenseService(createExpenseRepository(db), categories);
-  const budgets = createBudgetService(createBudgetRepository(db), categories, now);
+  const expenseRepository = createExpenseRepository(db);
+  const expenses = createExpenseService(expenseRepository, categories);
+  const budgets = createBudgetService(createBudgetRepository(db), categories, expenseRepository, now);
 
   const app = express();
   app.use(express.json());

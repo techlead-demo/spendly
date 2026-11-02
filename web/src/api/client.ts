@@ -7,6 +7,7 @@ import type {
   ListResponse,
   MonthBudgets,
   MonthlySummary,
+  MonthOverBudget,
   NewExpense,
 } from './types';
 
@@ -90,6 +91,10 @@ export function fetchSummary(month: string): Promise<MonthlySummary> {
 
 export function fetchBudgets(month: string): Promise<MonthBudgets> {
   return request<MonthBudgets>(`/budgets?${new URLSearchParams({ month })}`);
+}
+
+export function fetchOverBudget(month: string): Promise<MonthOverBudget> {
+  return request<MonthOverBudget>(`/budgets/over?${new URLSearchParams({ month })}`);
 }
 
 /** Sets (amount) or removes (null) the given budgets from `month` onward; resolves to the budgets of `month`. */

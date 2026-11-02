@@ -51,3 +51,23 @@ export interface MonthBudgets {
   month: string;
   items: Budget[];
 }
+
+/** A category whose total is greater than its budget in effect for a month (BR-19). */
+export interface OverBudgetCategory {
+  categoryId: number;
+  categoryName: string;
+  /** Category total of the month (BR-13), integer minor units of VND. */
+  spentMinor: number;
+  /** Budget in effect for the month (BR-16). */
+  budgetMinor: number;
+  /** `spentMinor - budgetMinor`, always at least 1. */
+  overMinor: number;
+}
+
+/** Response of GET /api/v1/budgets/over. */
+export interface MonthOverBudget {
+  /** "YYYY-MM" */
+  month: string;
+  /** Largest `overMinor` first; equal amounts in category order (BR-5). */
+  items: OverBudgetCategory[];
+}

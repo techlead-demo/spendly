@@ -55,6 +55,22 @@ export interface MonthBudgets {
   items: Budget[];
 }
 
+/** A category whose total is greater than its budget in effect for the month (BR-19). */
+export interface OverBudgetCategory {
+  categoryId: number;
+  categoryName: string;
+  spentMinor: number;
+  budgetMinor: number;
+  overMinor: number;
+}
+
+/** Response of GET /api/v1/budgets/over: largest `overMinor` first, ties in category order. */
+export interface MonthOverBudget {
+  /** "YYYY-MM" */
+  month: string;
+  items: OverBudgetCategory[];
+}
+
 export interface ApiErrorBody {
   error: { code: string; message: string };
 }

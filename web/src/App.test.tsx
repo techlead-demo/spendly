@@ -9,6 +9,7 @@ import {
   fetchCategories,
   fetchExpense,
   fetchExpenses,
+  fetchOverBudget,
   fetchSummary,
   restoreExpense,
   updateExpense,
@@ -26,6 +27,7 @@ vi.mock('./api/client', async (importActual) => ({
   updateExpense: vi.fn(),
   deleteExpense: vi.fn(),
   restoreExpense: vi.fn(),
+  fetchOverBudget: vi.fn(),
 }));
 
 const CATEGORIES: Category[] = [
@@ -61,6 +63,7 @@ describe('App', () => {
     vi.mocked(fetchExpenses).mockResolvedValue({ items: [], monthTotalMinor: 0 });
     vi.mocked(createExpense).mockResolvedValue(saved);
     vi.mocked(fetchSummary).mockResolvedValue({ month: '2026-11', items: [], monthCount: 0, monthTotalMinor: 0 });
+    vi.mocked(fetchOverBudget).mockResolvedValue({ month: '2026-11', items: [] });
     vi.mocked(fetchBudgets).mockResolvedValue({
       month: '2026-11',
       items: CATEGORIES.map((c) => ({ categoryId: c.id, amountMinor: null })),
