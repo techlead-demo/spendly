@@ -33,6 +33,42 @@ async function bodyRows(page: Page): Promise<string[][]> {
   return result;
 }
 
+type SummaryOnScreen = {
+  rows: Record<string, { count: number; total: number }>;
+  monthCount: number;
+  monthTotal: number;
+};
+
+const digits = (s: string) => Number(s.replace(/\D/g, ''));
+
+/** Picks `month` on the Summary screen, waits for its response, and reads the rows and the footer. */
+async function summaryOf(page: Page, month: string): Promise<SummaryOnScreen> {
+  if ((await page.getByLabel('Month').inputValue()) !== month) {
+    const response = page.waitForResponse((r) => r.url().includes(`/api/v1/summary?month=${month}`));
+    await page.getByLabel('Month').fill(month);
+    await response;
+  }
+  await expect(page.getByRole('table').or(page.getByText('No expenses for this month.'))).toBeVisible();
+  if ((await page.getByRole('table').count()) === 0) return { rows: {}, monthCount: 0, monthTotal: 0 };
+  const rows: SummaryOnScreen['rows'] = {};
+  for (const [name, count, total] of await bodyRows(page)) {
+    rows[name!] = { count: Number(count), total: digits(total!) };
+  }
+  const footer = await page.getByRole('table').locator('tfoot tr').getByRole('cell').allTextContents();
+  return { rows, monthCount: Number(footer[1]), monthTotal: digits(footer[2]!) };
+}
+
+async function addExpense(page: Page, values: { date: string; amount: string; category: string }) {
+  await page.getByRole('button', { name: 'Add expense' }).click();
+  await expect(page.getByLabel('Category').locator('option')).toHaveCount(7);
+  await page.getByLabel('Date').fill(values.date);
+  await page.getByLabel('Amount').fill(values.amount);
+  await page.getByLabel('Category').selectOption({ label: values.category });
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
+  await expect(page.getByLabel('Month')).toHaveValue(values.date.slice(0, 7));
+}
+
 test.describe('monthly summary (QA)', () => {
   test('TC-1 (AC-1): the active link is underlined and "Categories" is not shown', async ({ page }) => {
     await page.goto('/#/summary');
@@ -124,6 +160,66 @@ test.describe('monthly summary (QA)', () => {
 
     await expect(page.getByRole('alert')).toHaveText('Could not load the summary. Try again.');
     await expect(page.getByRole('table')).toHaveCount(0);
+  });
+
+  test('TC-11 (AC-8): Food 30.000 ₫ recorded on the form raises the 2026-11 Food row and month total', async ({
+    page,
+  }) => {
+    await page.goto('/#/summary');
+    await expect(page.getByLabel('Month')).toHaveValue('2026-11');
+    await expect(page.getByRole('table')).toBeVisible();
+    const before = await summaryOf(page, '2026-11');
+
+    await page.getByRole('navigation').getByRole('link', { name: 'Expenses' }).click();
+    await addExpense(page, { date: '2026-11-02', amount: '30000', category: 'Food' });
+    await page.getByRole('navigation').getByRole('link', { name: 'Summary' }).click();
+
+    await expect(page.getByLabel('Month')).toHaveValue('2026-11');
+    await expect.poll(() => summaryOf(page, '2026-11')).toEqual({
+      rows: {
+        ...before.rows,
+        Food: { count: (before.rows.Food?.count ?? 0) + 1, total: (before.rows.Food?.total ?? 0) + 30_000 },
+      },
+      monthCount: before.monthCount + 1,
+      monthTotal: before.monthTotal + 30_000,
+    });
+  });
+
+  test('TC-29 (AC-7): an expense recorded on 2026-10-31 counts in October, not in November', async ({ page }) => {
+    await page.goto('/#/summary');
+    await expect(page.getByRole('table')).toBeVisible();
+    const novBefore = await summaryOf(page, '2026-11');
+    const octBefore = await summaryOf(page, '2026-10');
+
+    await page.getByRole('navigation').getByRole('link', { name: 'Expenses' }).click();
+    await addExpense(page, { date: '2026-10-31', amount: '7777', category: 'Entertainment' });
+    await page.getByRole('navigation').getByRole('link', { name: 'Summary' }).click();
+    await expect(page.getByRole('table')).toBeVisible();
+
+    expect(await summaryOf(page, '2026-11')).toEqual(novBefore);
+    const ent = octBefore.rows.Entertainment ?? { count: 0, total: 0 };
+    expect(await summaryOf(page, '2026-10')).toEqual({
+      rows: { ...octBefore.rows, Entertainment: { count: ent.count + 1, total: ent.total + 7777 } },
+      monthCount: octBefore.monthCount + 1,
+      monthTotal: octBefore.monthTotal + 7777,
+    });
+  });
+
+  test('TC-30 (AC-2): leaving the Add expense form via "Summary" and back via "Expenses" opens the list', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Add expense' }).click();
+    await expect(page.getByRole('heading', { name: 'Add expense' })).toBeVisible();
+
+    await page.getByRole('navigation').getByRole('link', { name: 'Summary' }).click();
+    await expect(page.getByRole('heading', { name: 'Summary' })).toBeVisible();
+    await expect(page.getByLabel('Month')).toHaveValue('2026-11');
+    await page.getByRole('navigation').getByRole('link', { name: 'Expenses' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
+    await expect(page.getByLabel('Month')).toHaveValue('2026-11');
+    await expect(page.getByTestId('month-total')).toBeVisible();
   });
 
   test('TC-17 (AC-13): clearing the month keeps the summary and sends no request', async ({ page }) => {
