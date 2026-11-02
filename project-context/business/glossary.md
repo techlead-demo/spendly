@@ -15,4 +15,7 @@
 - **Monthly summary**: the screen showing a month's spending grouped by category, with the number of expenses and the total per category and the month total.
 - **Category total**: the total amount spent in one category in the selected month, shown in the monthly summary.
 - **Share**: a category total as a percentage of the month total, shown in the monthly summary (e.g. `95,5%`).
+- **Budget**: the amount the user plans to spend in one category in a month. It carries forward to later months until changed or removed; a category without a budget has no limit.
+- **Budget in effect**: the budget that applies to a category in a given month: the one set from the latest month not after that month, or none.
+- **Budgets screen**: the screen where the user views a month's budgets per category and sets, changes or removes them for the current or a later month.
 - **Sample data**: the expenses a new database is created with, so the app is not empty on first use.

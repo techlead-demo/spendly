@@ -1,0 +1,80 @@
+<!doctype html>
+<!-- Wireframe for SPD-4: Budgets screen (current or future month, editable). App shell and styles copied from project-context/design/screens/expense-form-errors.html; the data is illustrative. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spendly wireframe: Budgets</title>
+  <link rel="stylesheet" href="../../../project-context/design/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family); font-size: var(--font-size-md); line-height: var(--line-height); color: var(--color-text); background: var(--color-bg); }
+    button, input, select, textarea { font: inherit; }
+    .header { display: flex; align-items: center; gap: var(--space-6); height: var(--header-height); padding: 0 var(--space-6); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .brand { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-primary); }
+    .nav { display: flex; gap: var(--space-4); }
+    .nav a { color: var(--color-text-muted); text-decoration: none; padding: var(--space-2) 0; }
+    .nav a.active { color: var(--color-text); font-weight: var(--font-weight-medium); border-bottom: 2px solid var(--color-primary); }
+    .main { max-width: var(--content-max-width); margin: 0 auto; padding: var(--space-6); }
+    .titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    h1 { margin: 0; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .field { display: flex; flex-direction: column; gap: var(--space-1); }
+    .label { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .control { height: var(--control-height); padding: 0 var(--space-3); color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); }
+    .control.invalid { border-color: var(--color-danger); }
+    .fieldError { font-size: var(--font-size-sm); color: var(--color-danger); }
+    .hint { font-size: var(--font-size-sm); color: var(--color-text-muted); margin: 0 0 var(--space-4); }
+    .button { height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+    .button.primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
+    .table { width: 100%; border-collapse: collapse; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .table th, .table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    .table th { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-muted); background: var(--color-surface-muted); }
+    .table tbody tr:last-child td { border-bottom: none; }
+    .amount { position: relative; display: inline-block; }
+    .amount .control { width: 220px; padding-right: var(--space-6); }
+    .amount .suffix { position: absolute; right: var(--space-3); top: 50%; transform: translateY(-50%); color: var(--color-text-muted); }
+    .banner { display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); border-radius: var(--radius-sm); border: 1px solid; }
+    .banner.error { color: var(--color-danger); background: var(--color-danger-bg); border-color: var(--color-danger); }
+    .actions { display: flex; gap: var(--space-3); align-items: center; margin-top: var(--space-4); }
+    .mockupNote { max-width: var(--content-max-width); margin: 0 auto; padding: 0 var(--space-6) var(--space-6); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <span class="brand">Spendly</span>
+    <nav class="nav">
+      <a href="#">Expenses</a>
+      <a href="#">Summary</a>
+      <a href="#" class="active">Budgets</a>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="titleRow"><h1>Budgets</h1></div>
+    <div class="toolbar">
+      <label class="field"><span class="label">Month</span><input class="control" type="month" value="2026-11" min="2026-11" /></label>
+    </div>
+    <p class="hint">A budget applies to this month and every later month until you change it. Leave it empty for no limit.</p>
+    <div class="banner error" role="alert">Please fix the highlighted fields.</div>
+    <form novalidate>
+      <table class="table">
+        <thead>
+          <tr><th>Category</th><th>Monthly budget</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Food</td><td><span class="amount"><input class="control" inputmode="numeric" placeholder="No limit" value="700000" aria-label="Food budget" /><span class="suffix">₫</span></span></td></tr>
+          <tr><td>Transport</td><td><span class="amount"><input class="control invalid" aria-invalid="true" inputmode="numeric" placeholder="No limit" value="12,5" aria-label="Transport budget" /><span class="suffix">₫</span></span><div class="fieldError">Enter a whole amount in đồng, greater than 0.</div></td></tr>
+          <tr><td>Housing</td><td><span class="amount"><input class="control" inputmode="numeric" placeholder="No limit" value="" aria-label="Housing budget" /><span class="suffix">₫</span></span></td></tr>
+          <tr><td>Health</td><td><span class="amount"><input class="control" inputmode="numeric" placeholder="No limit" value="" aria-label="Health budget" /><span class="suffix">₫</span></span></td></tr>
+          <tr><td>Entertainment</td><td><span class="amount"><input class="control" inputmode="numeric" placeholder="No limit" value="300000" aria-label="Entertainment budget" /><span class="suffix">₫</span></span></td></tr>
+          <tr><td>Other</td><td><span class="amount"><input class="control" inputmode="numeric" placeholder="No limit" value="" aria-label="Other budget" /><span class="suffix">₫</span></span></td></tr>
+        </tbody>
+      </table>
+      <div class="actions">
+        <button class="button primary" type="submit">Save</button>
+      </div>
+    </form>
+  </main>
+  <p class="mockupNote">Wireframe (SPD-4). Shown here: the validation error state after Save. Initial state: no banner, no field errors. One row per category in the fixed order; the input shows the budget in effect for the selected month as plain digits, or is empty ("No limit"). After a successful Save: status text "Budgets saved." next to Save. Past month (earlier than the current month): same table with all inputs disabled, no Save button, and the text "Past months cannot be changed." instead of the hint. Loading: "Loading…" instead of the table. Load error: alert "Could not load the budgets. Try again." instead of the table. Save error: alert "Could not save the budgets. Try again." above the table; the edits stay in the fields.</p>
+</body>
+</html>
