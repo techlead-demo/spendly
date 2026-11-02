@@ -1,7 +1,7 @@
 ---
 issue: SPD-3
 spec_version: 4
-revision: 3
+revision: 4
 ---
 
 # Implementation plan — SPD-3
@@ -54,7 +54,7 @@ existing local database needs `npm run db:reset` (no migration tool, see runbook
 | AC-10, AC-12 – AC-16 | web/src/pages/EditExpensePage.test.tsx |
 | AC-18, AC-19, AC-22 – AC-28 | web/src/pages/EditExpensePage.test.tsx |
 | AC-20, AC-21 | web/src/App.test.tsx; e2e/edit-expense.spec.ts (AC-20) |
-| AC-29 – AC-34, AC-42 – AC-45 | server/test/editExpense.test.ts |
+| AC-29 – AC-34, AC-42 – AC-45 | server/test/editExpense.test.ts (AC-45 also against `/budgets/over`) |
 | AC-35 – AC-41 | web/src/App.test.tsx; e2e/edit-expense.spec.ts (AC-35) |
 
 ## Context updates
@@ -80,3 +80,9 @@ existing local database needs `npm run db:reset` (no migration tool, see runbook
 | AI review 1: looks good, no findings | Nothing to change. |
 | Admin (Jira): the PR has conflicts | Fixed. Merged `develop` (SPD-5 over-budget banner) into `feat/SPD-3`. The only conflict, in `web/src/App.test.tsx`, was the imports and the `./api/client` mock: both sides are kept (`fetchOverBudget` plus the SPD-3 client functions). |
 | Merge integration (found while merging) | Fixed. The SPD-5 banner loaded only when the month changed, so after "Undo" restored an expense the list reloaded but the banner could stay stale. `ExpenseListPage` now reloads the banner on `reloadKey` too; new App.test "AC-35: Undo also reloads the over-budget banner of the month". |
+
+## Revision 4
+| Feedback item | Resolution |
+|---|---|
+| AI review 1 [minor]: no test shows a deleted expense stops counting in `/budgets/over` (AC-45, BR-21) | Fixed. New server/test/editExpense.test.ts case "AC-45: a deleted expense stops counting in the over-budget check and counts again after restore (BR-21)": with a Food budget of 200.000 ₫, Food is over budget, is gone from `GET /api/v1/budgets/over` after DELETE and is back after restore. No code change: `sumByCategory` already filters `deleted = 0`. |
+| Admin (Jira): fix the minor; CI seems to have failed too | Minor fixed (above). The CI log could not be read from this job because `gh` is not allowed here. Every CI step (`npm ci`, `npm run lint`, `npm test`, `npx playwright test`) passes locally on Node 24 against the merged `develop`. No date or timezone dependency was found: the commit and the CI run fall on the same day in UTC and in local time. If CI fails again, the failing step and test from the Actions log are needed to fix it. |

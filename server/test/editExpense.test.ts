@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createTestContext, insertExpense } from './helpers.js';
+import { createTestContext, insertBudget, insertExpense } from './helpers.js';
 
 const FOOD = 1;
 const TRANSPORT = 2;
@@ -167,6 +167,21 @@ describe('DELETE /api/v1/expenses/:id', () => {
     const summary = await request(context.app).get('/api/v1/summary?month=2026-11');
     expect(summary.body).toMatchObject({ monthCount: 1, monthTotalMinor: 50_000 });
     expect(summary.body.items).toEqual([{ categoryId: FOOD, categoryName: 'Food', count: 1, totalMinor: 50_000 }]);
+  });
+
+  it('AC-45: a deleted expense stops counting in the over-budget check and counts again after restore (BR-21)', async () => {
+    insertBudget(context.db, { categoryId: FOOD, fromMonth: '2026-11', amountMinor: 200_000 });
+    const overFood = () =>
+      request(context.app)
+        .get('/api/v1/budgets/over?month=2026-11')
+        .then((res) => res.body.items.map((item: { categoryId: number }) => item.categoryId));
+    expect(await overFood()).toEqual([FOOD]);
+
+    await request(context.app).delete(`/api/v1/expenses/${id}`);
+    expect(await overFood()).toEqual([]);
+
+    await request(context.app).post(`/api/v1/expenses/${id}/restore`);
+    expect(await overFood()).toEqual([FOOD]);
   });
 });
 
