@@ -25,8 +25,10 @@ server/src/
   lib/                pure helpers (dates)
 server/test/          Vitest + Supertest tests, helpers.ts
 web/src/
-  main.tsx, App.tsx   entry and app shell (header + page); App holds the current view (list | add) and the list filter
-  pages/              one component per screen (ExpenseListPage, AddExpensePage)
+  main.tsx, App.tsx   entry and app shell (header navigation + page); App holds the screen (from the URL hash),
+                      the expenses view (list | add) and the list filter
+  pages/              one component per screen (ExpenseListPage, AddExpensePage, BudgetsPage,
+                      SummaryPlaceholderPage until SPD-2 is merged)
   components/         reusable presentational components (ExpenseTable)
   api/                client.ts (fetch wrappers, ApiError) and types.ts (API shapes)
   lib/                pure helpers (money, dates, expenseForm validation) with co-located tests
@@ -45,5 +47,14 @@ web/src/
 - When the database file did not exist before startup (or is `:memory:`), `index.ts` inserts the sample expenses (`seedSampleExpenses`).
 - There is no migration tool. Schema changes go into `db/schema.ts`; an existing local DB is rebuilt with `npm run db:reset` (see runbook).
 
+## Navigation
+Hash based, no router dependency: `#/` Expenses, `#/summary` Summary, `#/budgets` Budgets. The header links set the
+hash; `App` follows `hashchange`. Within Expenses, `App` switches between the list and the Add expense form with a view
+state.
+
+## Clock
+`createApp(db, { now })` takes the clock for rules that depend on today (BR-18: budgets only from the current month).
+It defaults to the system clock; server tests pass a fixed date.
+
 ## Not present yet
-No router (`App` switches between the list and the Add expense form with a view state), no state library, no auth, no build/deploy pipeline beyond CI.
+No router library, no state library, no auth, no build/deploy pipeline beyond CI.

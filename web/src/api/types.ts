@@ -26,6 +26,19 @@ export interface ExpenseListResponse extends ListResponse<Expense> {
   monthTotalMinor: number;
 }
 
+/** The budget of one category in effect for a month; `amountMinor` is null when there is no budget (no limit). */
+export interface Budget {
+  categoryId: number;
+  amountMinor: number | null;
+}
+
+/** Response of GET and PUT /api/v1/budgets; also the body of PUT (only the changed categories). */
+export interface MonthBudgets {
+  /** "YYYY-MM" */
+  month: string;
+  items: Budget[];
+}
+
 export interface ApiErrorBody {
   error: { code: string; message: string };
 }

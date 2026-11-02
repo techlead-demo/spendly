@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
-import { createExpense, fetchCategories, fetchExpenses } from './api/client';
+import { createExpense, fetchBudgets, fetchCategories, fetchExpenses } from './api/client';
 import type { Category, Expense } from './api/types';
 
 vi.mock('./api/client', async (importActual) => ({
@@ -9,6 +9,7 @@ vi.mock('./api/client', async (importActual) => ({
   fetchCategories: vi.fn(),
   fetchExpenses: vi.fn(),
   createExpense: vi.fn(),
+  fetchBudgets: vi.fn(),
 }));
 
 const CATEGORIES: Category[] = [
@@ -35,6 +36,11 @@ describe('App', () => {
     vi.mocked(fetchCategories).mockResolvedValue(CATEGORIES);
     vi.mocked(fetchExpenses).mockResolvedValue({ items: [], monthTotalMinor: 0 });
     vi.mocked(createExpense).mockResolvedValue(saved);
+    vi.mocked(fetchBudgets).mockResolvedValue({
+      month: '2026-11',
+      items: CATEGORIES.map((c) => ({ categoryId: c.id, amountMinor: null })),
+    });
+    window.location.hash = '';
   });
 
   afterEach(() => {
@@ -74,6 +80,36 @@ describe('App', () => {
     await waitFor(() => expect(filterControls().month).toHaveValue('2026-09'));
     expect(filterControls().category).toHaveDisplayValue('All categories');
     expect(fetchExpenses).toHaveBeenLastCalledWith('2026-09', undefined);
+  });
+
+  it('SPD-4 AC-1: the header shows "Spendly" and the links Expenses, Summary, Budgets with the current one active', async () => {
+    await openList();
+
+    const banner = screen.getByRole('banner');
+    expect(banner.firstElementChild).toHaveTextContent('Spendly');
+    const links = screen.getAllByRole('link');
+    expect(links.map((link) => link.textContent)).toEqual(['Expenses', 'Summary', 'Budgets']);
+    expect(screen.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Budgets' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('SPD-4 AC-1, AC-2: "Budgets" opens the Budgets screen on the current month and marks its link active', async () => {
+    await openList();
+    fireEvent.click(screen.getByRole('button', { name: 'Add expense' }));
+
+    fireEvent.click(screen.getByRole('link', { name: 'Budgets' }));
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    expect(await screen.findByRole('heading', { name: 'Budgets' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Month')).toHaveValue('2026-11');
+    expect(screen.getByRole('link', { name: 'Budgets' })).toHaveAttribute('aria-current', 'page');
+    await screen.findByRole('textbox', { name: 'Food budget' });
+    expect(fetchBudgets).toHaveBeenCalledWith('2026-11');
+
+    fireEvent.click(screen.getByRole('link', { name: 'Expenses' }));
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+
+    expect(await screen.findByRole('heading', { name: 'Expenses' })).toBeInTheDocument();
   });
 
   it('AC-11: Cancel returns to the list with the month and category it had before', async () => {

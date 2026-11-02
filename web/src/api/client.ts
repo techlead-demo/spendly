@@ -1,4 +1,13 @@
-import type { ApiErrorBody, Category, Expense, ExpenseListResponse, ListResponse, NewExpense } from './types';
+import type {
+  ApiErrorBody,
+  Budget,
+  Category,
+  Expense,
+  ExpenseListResponse,
+  ListResponse,
+  MonthBudgets,
+  NewExpense,
+} from './types';
 
 const BASE_PATH = '/api/v1';
 
@@ -46,5 +55,18 @@ export function createExpense(expense: NewExpense): Promise<Expense> {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(expense),
+  });
+}
+
+export function fetchBudgets(month: string): Promise<MonthBudgets> {
+  return request<MonthBudgets>(`/budgets?${new URLSearchParams({ month })}`);
+}
+
+/** Sets (amount) or removes (null) the given budgets from `month` onward; resolves to the budgets of `month`. */
+export function saveBudgets(month: string, items: Budget[]): Promise<MonthBudgets> {
+  return request<MonthBudgets>('/budgets', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ month, items }),
   });
 }
