@@ -341,8 +341,14 @@ describe('App', () => {
       expect(status).toHaveTextContent('Expense deleted.');
       expect(status).toHaveAttribute('aria-live', 'polite');
       const undo = within(status!).getByRole('button', { name: 'Undo' });
-      undo.focus();
-      expect(undo).toHaveFocus();
+      // Reachable with Tab: a native, enabled button that is not taken out of the tab order.
+      expect(undo.tagName).toBe('BUTTON');
+      expect(undo).toBeEnabled();
+      expect(undo.tabIndex).toBe(0);
+      expect(undo).not.toHaveAttribute('tabindex');
+      const tabbable = Array.from(document.querySelectorAll<HTMLElement>('a[href], button, input, select, textarea'))
+        .filter((el) => !(el as HTMLButtonElement).disabled && el.tabIndex >= 0);
+      expect(tabbable).toContain(undo);
     });
 
     it('AC-21: deleting the only expense shows the empty month with a total of 0 ₫ and the toast', async () => {

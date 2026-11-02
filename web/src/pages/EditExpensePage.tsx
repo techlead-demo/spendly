@@ -44,6 +44,11 @@ function isNotFound(error: unknown): boolean {
   return error instanceof ApiError && error.status === 404;
 }
 
+/** Ids the API can store; any other id in a hand-typed or stale link cannot exist (AC-24). */
+function isExpenseId(id: number): boolean {
+  return Number.isSafeInteger(id) && id > 0;
+}
+
 export function EditExpensePage({ expenseId, onSaved, onCancel, onDeleted, onBack }: EditExpensePageProps) {
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [stored, setStored] = useState<Expense | null>(null);
@@ -56,6 +61,8 @@ export function EditExpensePage({ expenseId, onSaved, onCancel, onDeleted, onBac
   const [deleting, setDeleting] = useState(false);
   // Guard against a second request before React re-renders the disabled buttons (AC-10, AC-23).
   const busyRef = useRef(false);
+  // A Save that finishes after the user left the page must not navigate (AC-11).
+  const mountedRef = useRef(false);
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
   const fieldRefs: ExpenseFieldRefs = {
     date: useRef<HTMLInputElement>(null),
@@ -64,6 +71,17 @@ export function EditExpensePage({ expenseId, onSaved, onCancel, onDeleted, onBac
   };
 
   useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isExpenseId(expenseId)) {
+      setLoadState('notFound');
+      return;
+    }
     let cancelled = false;
     Promise.all([fetchExpense(expenseId), fetchCategories()])
       .then(([expense, items]) => {
@@ -103,8 +121,10 @@ export function EditExpensePage({ expenseId, onSaved, onCancel, onDeleted, onBac
     busyRef.current = true;
     setSaving(true);
     try {
-      onSaved(await updateExpense(expenseId, result.expense));
+      const saved = await updateExpense(expenseId, result.expense);
+      if (mountedRef.current) onSaved(saved);
     } catch (e) {
+      if (!mountedRef.current) return;
       if (isNotFound(e)) {
         setLoadState('notFound');
       } else {
@@ -182,7 +202,7 @@ export function EditExpensePage({ expenseId, onSaved, onCancel, onDeleted, onBac
             <button type="submit" className={`${styles.button} ${styles.primary}`} disabled={saving || deleting}>
               Save
             </button>
-            <button type="button" className={styles.button} onClick={onCancel}>
+            <button type="button" className={styles.button} disabled={saving || deleting} onClick={onCancel}>
               Cancel
             </button>
             <span className={styles.spacer} />

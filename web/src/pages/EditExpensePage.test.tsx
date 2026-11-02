@@ -167,7 +167,7 @@ describe('EditExpensePage', () => {
     expect(updateExpense).toHaveBeenCalledWith(7, { date: E.date, amountMinor: 280_000, categoryId: 1, note: E.note });
   });
 
-  it('AC-10: sends only one update and disables Save and Delete while it runs', async () => {
+  it('AC-10: sends only one update and disables Save, Cancel and Delete while it runs', async () => {
     const pending = deferred<Expense>();
     vi.mocked(updateExpense).mockReturnValue(pending.promise);
     const { onSaved } = await renderLoaded();
@@ -177,6 +177,7 @@ describe('EditExpensePage', () => {
     fireEvent.submit(button('Save').closest('form')!);
 
     expect(button('Save')).toBeDisabled();
+    expect(button('Cancel')).toBeDisabled();
     expect(button('Delete')).toBeDisabled();
     expect(updateExpense).toHaveBeenCalledTimes(1);
     pending.resolve(E);
@@ -192,6 +193,28 @@ describe('EditExpensePage', () => {
     expect(onCancel).toHaveBeenCalled();
     expect(updateExpense).not.toHaveBeenCalled();
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('AC-11: Cancel cannot be clicked during a Save, and a Save finishing after the page closed does not navigate', async () => {
+    const pending = deferred<Expense>();
+    vi.mocked(updateExpense).mockReturnValue(pending.promise);
+    vi.mocked(fetchExpense).mockResolvedValue(E);
+    const onSaved = vi.fn();
+    const onCancel = vi.fn();
+    const { unmount } = render(
+      <EditExpensePage expenseId={7} onSaved={onSaved} onCancel={onCancel} onDeleted={vi.fn()} onBack={vi.fn()} />,
+    );
+    await screen.findByRole('button', { name: 'Save' });
+
+    fireEvent.click(button('Save'));
+    fireEvent.click(button('Cancel'));
+    expect(onCancel).not.toHaveBeenCalled();
+
+    unmount();
+    pending.resolve(E);
+    await pending.promise;
+    await Promise.resolve();
+    expect(onSaved).not.toHaveBeenCalled();
   });
 
   it.each(['', '0', '-5000', '12,5', '12.5', '280.000'])(
@@ -353,6 +376,17 @@ describe('EditExpensePage', () => {
       fireEvent.click(screen.getByRole('link', { name: 'Back to expenses' }));
       expect(onBack).toHaveBeenCalled();
     });
+
+    it.each([0, Number.MAX_SAFE_INTEGER + 2])(
+      'AC-24: shows "This expense no longer exists." without a request for the impossible id %s',
+      async (id) => {
+        renderPage(id);
+
+        expect(await screen.findByRole('alert')).toHaveTextContent(NOT_FOUND);
+        expect(fetchExpense).not.toHaveBeenCalled();
+        expect(screen.getByRole('link', { name: 'Back to expenses' })).toBeInTheDocument();
+      },
+    );
 
     it('AC-25: a 404 on Save shows the not-found state', async () => {
       vi.mocked(updateExpense).mockRejectedValue(new ApiError(404, 'NOT_FOUND', 'expense 7 does not exist'));
