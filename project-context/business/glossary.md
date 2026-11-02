@@ -6,8 +6,8 @@
 - **Category**: a kind of spending (Food, Transport, ...). Every expense has exactly one. The user can add, rename, retire and restore categories.
 - **Default categories**: the six categories a new database starts with: Food, Transport, Housing, Health, Entertainment, Other.
 - **Category order**: the order categories are created in: the default categories first, then added categories, oldest first.
-- **Active category**: a category that can be chosen for a new expense.
-- **Retired category**: a category the user no longer uses. It is not offered for new expenses, but existing expenses keep it. It can be restored to active.
+- **Active category**: a category that can be chosen for a new or edited expense.
+- **Retired category**: a category the user no longer uses. It is not offered for new expenses or as a new category of an edited expense, but existing expenses keep it. It can be restored to active.
 - **Categories screen**: the screen where the user adds, renames, retires and restores categories.
 - **Note**: optional free text describing an expense ("Groceries at Co.opmart").
 - **Date (expense date)**: the local calendar day the expense happened, `YYYY-MM-DD`, no time or time zone.
