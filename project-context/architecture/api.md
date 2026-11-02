@@ -159,6 +159,37 @@ Response 200:
 | `month` | string | The requested month |
 | `items` | Budget[] | `{ categoryId, amountMinor }`; `amountMinor` is an integer (VND minor units) or `null` for no budget (no limit) |
 
+## GET /api/v1/budgets/over
+The categories over budget in one month (BR-19): a budget is in effect for the month (BR-16) and the category total of
+the month (BR-13, all expenses dated in the month) is greater than it. Equal to the budget is not over; a category
+without a budget is never listed. Ordered by `overMinor` descending; equal amounts follow the fixed category order
+(category `id`). The web app shows these in the over-budget banner of the expense list (SPD-5).
+
+Query parameters:
+| Name | Required | Format | Notes |
+|---|---|---|---|
+| `month` | yes | `YYYY-MM` | 400 `VALIDATION_ERROR` if missing or malformed (same check as `GET /api/v1/expenses`) |
+
+Request: `GET /api/v1/budgets/over?month=2026-11`
+
+Response 200:
+```json
+{
+  "month": "2026-11",
+  "items": [
+    { "categoryId": 1, "categoryName": "Food", "spentMinor": 785000, "budgetMinor": 700000, "overMinor": 85000 },
+    { "categoryId": 5, "categoryName": "Entertainment", "spentMinor": 350000, "budgetMinor": 300000, "overMinor": 50000 }
+  ]
+}
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `month` | string | The requested month |
+| `items` | OverBudgetCategory[] | `{ categoryId, categoryName, spentMinor, budgetMinor, overMinor }`, integers in VND minor units; `overMinor = spentMinor - budgetMinor` (≥ 1). Empty when no category is over budget |
+
+Errors: `GET /api/v1/budgets/over?month=2026-13` → 400 `VALIDATION_ERROR` with the message `month is required and must be YYYY-MM`.
+
 ## PUT /api/v1/budgets
 Sets or removes the budget of one or more categories from `month` onward (BR-16, BR-17, BR-18). Earlier months and
 budgets set or removed from a later month are not changed. Categories not listed keep their budgets. All items are
