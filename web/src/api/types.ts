@@ -15,7 +15,7 @@ export interface Expense {
   note: string | null;
 }
 
-/** Body of POST /api/v1/expenses. */
+/** Body of POST /api/v1/expenses and PUT /api/v1/expenses/:id. */
 export type NewExpense = Omit<Expense, 'id'>;
 
 export interface ListResponse<T> {
@@ -53,6 +53,22 @@ export interface MonthBudgets {
   /** "YYYY-MM" */
   month: string;
   items: Budget[];
+}
+
+/** A category whose total is greater than its budget in effect for the month (BR-19). */
+export interface OverBudgetCategory {
+  categoryId: number;
+  categoryName: string;
+  spentMinor: number;
+  budgetMinor: number;
+  overMinor: number;
+}
+
+/** Response of GET /api/v1/budgets/over: largest `overMinor` first, ties in category order. */
+export interface MonthOverBudget {
+  /** "YYYY-MM" */
+  month: string;
+  items: OverBudgetCategory[];
 }
 
 export interface ApiErrorBody {

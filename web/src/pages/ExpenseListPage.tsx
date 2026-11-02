@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { fetchCategories, fetchExpenses } from '../api/client';
-import type { Category, ExpenseListResponse } from '../api/types';
+import { fetchCategories, fetchExpenses, fetchOverBudget } from '../api/client';
+import type { Category, ExpenseListResponse, MonthOverBudget } from '../api/types';
 import { ExpenseTable } from '../components/ExpenseTable';
+import { OverBudgetBanner } from '../components/OverBudgetBanner';
+import { currentMonth } from '../lib/dates';
 import { formatMoney } from '../lib/money';
 import styles from './ExpenseListPage.module.css';
 
@@ -18,13 +20,16 @@ interface ExpenseListPageProps {
   filter: ExpenseListFilter;
   onFilterChange: (filter: ExpenseListFilter) => void;
   onAddExpense: () => void;
+  /** Changing it reloads the list (e.g. after an Undo restored an expense). */
+  reloadKey?: number;
 }
 
-export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: ExpenseListPageProps) {
+export function ExpenseListPage({ filter, onFilterChange, onAddExpense, reloadKey = 0 }: ExpenseListPageProps) {
   const { month, categoryId } = filter;
   const [categories, setCategories] = useState<Category[]>([]);
   const [list, setList] = useState<ExpenseListResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [overBudget, setOverBudget] = useState<MonthOverBudget | null>(null);
 
   useEffect(() => {
     fetchCategories()
@@ -46,7 +51,26 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
     return () => {
       cancelled = true;
     };
-  }, [month, categoryId]);
+  }, [month, categoryId, reloadKey]);
+
+  // The banner covers the whole month whatever the category filter (BR-8, SPD-5 AC-12). It is extra
+  // information: while it loads or when it fails, the list is shown without it and without an error.
+  // It reloads with the list, so an Undo that restores an expense also updates the banner (SPD-3).
+  useEffect(() => {
+    if (!month) return;
+    let cancelled = false;
+    setOverBudget(null);
+    fetchOverBudget(month)
+      .then((data) => {
+        if (!cancelled) setOverBudget(data);
+      })
+      .catch(() => {
+        if (!cancelled) setOverBudget(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [month, reloadKey]);
 
   return (
     <section>
@@ -56,6 +80,8 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
           Add expense
         </button>
       </div>
+
+      {overBudget && <OverBudgetBanner overBudget={overBudget} currentMonth={currentMonth()} />}
 
       <div className={styles.toolbar}>
         <label className={styles.field}>

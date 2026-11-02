@@ -1,0 +1,61 @@
+/* project-context/design/screens/expense-form-edit.html and specs/SPD-3/wireframes/edit-expense-not-found.html.
+   Shares the layout of the Add expense form. */
+
+.titleRow {
+  composes: titleRow from './AddExpensePage.module.css';
+}
+
+.title {
+  composes: title from './AddExpensePage.module.css';
+}
+
+.card {
+  composes: card from './AddExpensePage.module.css';
+}
+
+.banner {
+  composes: banner from './AddExpensePage.module.css';
+}
+
+.form {
+  composes: form from './AddExpensePage.module.css';
+}
+
+.actions {
+  composes: actions from './AddExpensePage.module.css';
+}
+
+.button {
+  composes: button from './AddExpensePage.module.css';
+}
+
+.primary {
+  composes: primary from './AddExpensePage.module.css';
+}
+
+.danger {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}

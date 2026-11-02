@@ -20,13 +20,26 @@ describe('ExpenseTable', () => {
     const rows = within(screen.getAllByRole('rowgroup')[1]!).getAllByRole('row');
     expect(rows).toHaveLength(2);
     const cells = within(rows[0]!).getAllByRole('cell').map((cell) => cell.textContent?.replace(/\s/g, ' '));
-    expect(cells).toEqual(['15/10/2026', 'Transport', 'Grab to office', '45.000 ₫']);
+    expect(cells).toEqual(['15/10/2026', 'Transport', 'Grab to office', '45.000 ₫', 'Edit']);
   });
 
-  it('shows an empty state when there are no expenses', () => {
+  it('AC-1: shows an "Edit" link to the Edit expense screen in the last column of every row, without a header', () => {
+    render(<ExpenseTable expenses={expenses} categories={categories} />);
+
+    const headers = screen.getAllByRole('columnheader').map((th) => th.textContent);
+    expect(headers).toEqual(['Date', 'Category', 'Note', 'Amount', '']);
+    const rows = within(screen.getAllByRole('rowgroup')[1]!).getAllByRole('row');
+    expect(rows.map((row) => within(row).getByRole('link', { name: 'Edit' }).getAttribute('href'))).toEqual([
+      '#/expenses/2/edit',
+      '#/expenses/1/edit',
+    ]);
+  });
+
+  it('AC-1: shows an empty state without Edit links when there are no expenses', () => {
     render(<ExpenseTable expenses={[]} categories={categories} />);
 
     expect(screen.getByText('No expenses for this month.')).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
   });
 });

@@ -17,8 +17,12 @@ export function validationError(message: string): HttpError {
   return new HttpError(400, 'VALIDATION_ERROR', message);
 }
 
+export function notFoundError(message: string): HttpError {
+  return new HttpError(404, 'NOT_FOUND', message);
+}
+
 export const notFoundHandler: RequestHandler = (req, _res, next) => {
-  next(new HttpError(404, 'NOT_FOUND', `No route for ${req.method} ${req.path}`));
+  next(notFoundError(`No route for ${req.method} ${req.path}`));
 };
 
 /** True for the errors `express.json()` raises for a body it cannot read (malformed JSON, too large, …). */

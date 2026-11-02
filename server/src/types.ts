@@ -15,7 +15,7 @@ export interface Expense {
   note: string | null;
 }
 
-/** Body of POST /api/v1/expenses after validation. */
+/** Body of POST /api/v1/expenses and PUT /api/v1/expenses/:id after validation. */
 export type NewExpense = Omit<Expense, 'id'>;
 
 /** Expenses of one category in one month (BR-13). */
@@ -50,4 +50,24 @@ export interface MonthBudgets {
   /** "YYYY-MM" */
   month: string;
   items: Budget[];
+}
+
+/** A category whose total is greater than its budget in effect for a month (BR-19). */
+export interface OverBudgetCategory {
+  categoryId: number;
+  categoryName: string;
+  /** Category total of the month (BR-13), integer minor units of VND. */
+  spentMinor: number;
+  /** Budget in effect for the month (BR-16). */
+  budgetMinor: number;
+  /** `spentMinor - budgetMinor`, always at least 1. */
+  overMinor: number;
+}
+
+/** Response of GET /api/v1/budgets/over. */
+export interface MonthOverBudget {
+  /** "YYYY-MM" */
+  month: string;
+  /** Largest `overMinor` first; equal amounts in category order (BR-5). */
+  items: OverBudgetCategory[];
 }

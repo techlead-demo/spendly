@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, UNKNOWN_ERROR_CODE, createExpense, fetchCategories } from '../api/client';
 import type { Category, Expense } from '../api/types';
+import { ExpenseFormFields, type ExpenseFieldRefs } from '../components/ExpenseFormFields';
 import { today } from '../lib/dates';
 import {
-  NOTE_MAX_LENGTH,
+  FIX_FIELDS_MESSAGE,
   VALIDATED_FIELDS,
   validateExpenseForm,
   type ExpenseFormErrors,
   type ExpenseFormValues,
-  type ValidatedField,
 } from '../lib/expenseForm';
 import styles from './AddExpensePage.module.css';
 
-const FIX_FIELDS_MESSAGE = 'Please fix the highlighted fields.';
 const SAVE_FAILED_MESSAGE = 'Could not save the expense. Try again.';
 const CATEGORIES_FAILED_MESSAGE = 'Could not load categories. Try again.';
 
@@ -34,11 +33,11 @@ export function AddExpensePage({ onSaved, onCancel }: AddExpensePageProps) {
   const [saving, setSaving] = useState(false);
   // Guards against a second submit before React re-renders the disabled button (AC-10).
   const savingRef = useRef(false);
-  const fieldRefs = {
+  const fieldRefs: ExpenseFieldRefs = {
     date: useRef<HTMLInputElement>(null),
     amount: useRef<HTMLInputElement>(null),
     categoryId: useRef<HTMLSelectElement>(null),
-  } satisfies Record<ValidatedField, unknown>;
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -84,25 +83,6 @@ export function AddExpensePage({ onSaved, onCancel }: AddExpensePageProps) {
     }
   }
 
-  function controlClass(field: ValidatedField): string | undefined {
-    return errors[field] ? `${styles.control} ${styles.invalid}` : styles.control;
-  }
-
-  function fieldError(field: ValidatedField) {
-    return (
-      errors[field] && (
-        <span className={styles.fieldError} id={`expense-${field}-error`}>
-          {errors[field]}
-        </span>
-      )
-    );
-  }
-
-  function describedBy(field: ValidatedField, hintId?: string): string | undefined {
-    const ids = [hintId, errors[field] ? `expense-${field}-error` : undefined];
-    return ids.filter((id) => id !== undefined).join(' ') || undefined;
-  }
-
   return (
     <section>
       <div className={styles.titleRow}>
@@ -115,86 +95,13 @@ export function AddExpensePage({ onSaved, onCancel }: AddExpensePageProps) {
           </div>
         )}
         <form className={styles.form} noValidate onSubmit={handleSubmit}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="expense-date">
-              Date
-            </label>
-            <input
-              id="expense-date"
-              ref={fieldRefs.date}
-              type="date"
-              className={controlClass('date')}
-              value={values.date}
-              aria-invalid={errors.date ? true : undefined}
-              aria-describedby={describedBy('date')}
-              onChange={(e) => setValue('date', e.target.value)}
-            />
-            {fieldError('date')}
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="expense-amount">
-              Amount
-            </label>
-            <span className={styles.amount}>
-              <input
-                id="expense-amount"
-                ref={fieldRefs.amount}
-                type="text"
-                inputMode="numeric"
-                placeholder="0"
-                className={controlClass('amount')}
-                value={values.amount}
-                aria-invalid={errors.amount ? true : undefined}
-                aria-describedby={describedBy('amount', 'expense-amount-hint')}
-                onChange={(e) => setValue('amount', e.target.value)}
-              />
-              <span className={styles.suffix} aria-hidden="true">
-                ₫
-              </span>
-            </span>
-            <span className={styles.hint} id="expense-amount-hint">
-              Whole đồng, no decimals.
-            </span>
-            {fieldError('amount')}
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="expense-category">
-              Category
-            </label>
-            <select
-              id="expense-category"
-              ref={fieldRefs.categoryId}
-              className={controlClass('categoryId')}
-              value={values.categoryId}
-              aria-invalid={errors.categoryId ? true : undefined}
-              aria-describedby={describedBy('categoryId')}
-              onChange={(e) => setValue('categoryId', e.target.value)}
-            >
-              <option value="">Choose a category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            {fieldError('categoryId')}
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="expense-note">
-              Note <span className={styles.muted}>(optional)</span>
-            </label>
-            <textarea
-              id="expense-note"
-              className={`${styles.control} ${styles.textarea}`}
-              rows={2}
-              maxLength={NOTE_MAX_LENGTH}
-              value={values.note}
-              onChange={(e) => setValue('note', e.target.value)}
-            />
-          </div>
+          <ExpenseFormFields
+            values={values}
+            errors={errors}
+            categories={categories}
+            fieldRefs={fieldRefs}
+            onChange={setValue}
+          />
 
           <div className={styles.actions}>
             <button type="submit" className={`${styles.button} ${styles.primary}`} disabled={saving}>
