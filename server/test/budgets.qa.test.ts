@@ -1,11 +1,12 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { createTestContext } from './helpers.js';
+import { createTestContext, insertExpense } from './helpers.js';
 
 // QA tests for SPD-4 (specs/SPD-4/test-cases.md). Every budget is written through the API, as a user would.
 
 const FOOD = 1;
 const TRANSPORT = 2;
+const HOUSING = 3;
 const ENTERTAINMENT = 5;
 const MAX_SAFE = 9007199254740991;
 
@@ -315,5 +316,28 @@ describe('SPD-4 QA: budgets API', () => {
     expect(categories.body.items).toHaveLength(6);
     expect(expenses.status).toBe(200);
     expect(expenses.body).toEqual({ items: [], monthTotalMinor: 0 });
+  });
+
+  it('TC-39: the SPD-2 summary endpoint is unchanged by stored budgets', async () => {
+    const context = createTestContext({ now: nov2 });
+    insertExpense(context.db, { date: '2026-11-01', amountMinor: 6_500_000, categoryId: HOUSING });
+    insertExpense(context.db, { date: '2026-11-02', amountMinor: 120_000, categoryId: FOOD });
+    await putOk(context, '2026-11', [
+      { categoryId: FOOD, amountMinor: 700_000 },
+      { categoryId: HOUSING, amountMinor: null },
+    ]);
+
+    const res = await request(context.app).get('/api/v1/summary').query({ month: '2026-11' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      month: '2026-11',
+      items: [
+        { categoryId: HOUSING, categoryName: 'Housing', count: 1, totalMinor: 6_500_000 },
+        { categoryId: FOOD, categoryName: 'Food', count: 1, totalMinor: 120_000 },
+      ],
+      monthCount: 2,
+      monthTotalMinor: 6_620_000,
+    });
   });
 });

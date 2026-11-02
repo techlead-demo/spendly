@@ -67,6 +67,31 @@ test.describe('SPD-4 QA: budgets', () => {
     await expect(page.getByLabel('Month')).toHaveValue(monthFromNow());
   });
 
+  test('TC-40: Budgets and the SPD-2 Summary screen live side by side in the header navigation', async ({ page }) => {
+    const nav = page.getByRole('navigation');
+    await page.goto('/#/budgets');
+    await expect(page.getByRole('heading', { name: 'Budgets' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Budgets' })).toHaveAttribute('aria-current', 'page');
+    await expect(budgetField(page, 'Food')).toBeVisible();
+
+    await nav.getByRole('link', { name: 'Summary' }).click();
+    await expect(page.getByRole('heading', { name: 'Summary' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Budgets' })).toHaveCount(0);
+    await expect(page.getByLabel('Month')).toHaveValue(monthFromNow());
+    await expect(nav.getByRole('link', { name: 'Summary' })).toHaveAttribute('aria-current', 'page');
+    await expect(nav.getByRole('link', { name: 'Budgets' })).not.toHaveAttribute('aria-current', 'page');
+
+    await page.getByLabel('Month').fill(monthFromNow(3));
+    await nav.getByRole('link', { name: 'Budgets' }).click();
+    await expect(page.getByRole('heading', { name: 'Budgets' })).toBeVisible();
+    await expect(page.getByLabel('Month')).toHaveValue(monthFromNow());
+    await expect(budgetField(page, 'Food')).toBeVisible();
+
+    await page.goto('/#/nope');
+    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
+  });
+
   test('TC-3 (AC-3): six category rows in order with "No limit", "₫" and the hint', async ({ page }) => {
     await openBudgets(page);
 
