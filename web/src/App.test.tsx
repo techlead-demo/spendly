@@ -380,6 +380,15 @@ describe('App', () => {
       expect(fetchExpenses).toHaveBeenLastCalledWith('2026-11', 1);
     });
 
+    it('AC-35: "Undo" also reloads the over-budget banner of the month', async () => {
+      await deleteE();
+      vi.mocked(fetchOverBudget).mockClear();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+
+      await waitFor(() => expect(fetchOverBudget).toHaveBeenCalledWith('2026-11'));
+    });
+
     describe('toast timing', () => {
       beforeEach(() => {
         vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout'], shouldAdvanceTime: true });

@@ -1,7 +1,7 @@
 ---
 issue: SPD-3
 spec_version: 4
-revision: 2
+revision: 3
 ---
 
 # Implementation plan — SPD-3
@@ -73,3 +73,10 @@ existing local database needs `npm run db:reset` (no migration tool, see runbook
 | Review: Cancel enabled during Save (AC-11) | Fixed. Cancel is disabled while Save or Delete runs, and a Save that resolves after the page unmounted (e.g. header navigation) no longer calls `onSaved`. |
 | Review: AC-41 keyboard test is weak | Fixed. The test asserts Undo is an enabled native button with tabIndex 0, no `tabindex` attribute, and in the document's tabbable elements. `userEvent.tab()` is not used because `@testing-library/user-event` is not a dependency and the fix does not justify adding one. |
 | Review nit: plan maps AC-5 to App.test | Fixed. The mapping row now names server/test/editExpense.test.ts and e2e. |
+
+## Revision 3
+| Feedback item | Resolution |
+|---|---|
+| AI review 1: looks good, no findings | Nothing to change. |
+| Admin (Jira): the PR has conflicts | Fixed. Merged `develop` (SPD-5 over-budget banner) into `feat/SPD-3`. The only conflict, in `web/src/App.test.tsx`, was the imports and the `./api/client` mock: both sides are kept (`fetchOverBudget` plus the SPD-3 client functions). |
+| Merge integration (found while merging) | Fixed. The SPD-5 banner loaded only when the month changed, so after "Undo" restored an expense the list reloaded but the banner could stay stale. `ExpenseListPage` now reloads the banner on `reloadKey` too; new App.test "AC-35: Undo also reloads the over-budget banner of the month". |
