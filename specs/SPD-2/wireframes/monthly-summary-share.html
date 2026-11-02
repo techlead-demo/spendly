@@ -1,0 +1,64 @@
+<!doctype html>
+<!-- Wireframe for SPD-2: monthly summary with the "Share" column. Based on project-context/design/screens/monthly-summary.html; the data is illustrative. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spendly wireframe: Monthly summary with share</title>
+  <link rel="stylesheet" href="../../../project-context/design/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family); font-size: var(--font-size-md); line-height: var(--line-height); color: var(--color-text); background: var(--color-bg); }
+    button, input, select, textarea { font: inherit; }
+    .header { display: flex; align-items: center; gap: var(--space-6); height: var(--header-height); padding: 0 var(--space-6); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .brand { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-primary); }
+    .nav { display: flex; gap: var(--space-4); }
+    .nav a { color: var(--color-text-muted); text-decoration: none; padding: var(--space-2) 0; }
+    .nav a.active { color: var(--color-text); font-weight: var(--font-weight-medium); border-bottom: 2px solid var(--color-primary); }
+    .main { max-width: var(--content-max-width); margin: 0 auto; padding: var(--space-6); }
+    .titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    h1 { margin: 0; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .field { display: flex; flex-direction: column; gap: var(--space-1); }
+    .label { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .control { height: var(--control-height); padding: 0 var(--space-3); color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); }
+    .table { width: 100%; border-collapse: collapse; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .table th, .table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--color-border); }
+    .table th { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-muted); background: var(--color-surface-muted); }
+    .table tbody tr:last-child td { border-bottom: none; }
+    .table tfoot td { font-weight: var(--font-weight-bold); background: var(--color-surface-muted); border-bottom: none; border-top: 1px solid var(--color-border); }
+    .num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .mockupNote { max-width: var(--content-max-width); margin: 0 auto; padding: 0 var(--space-6) var(--space-6); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <span class="brand">Spendly</span>
+    <nav class="nav">
+      <a href="#">Expenses</a>
+      <a href="#" class="active">Summary</a>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="titleRow"><h1>Summary</h1></div>
+    <div class="toolbar">
+      <label class="field"><span class="label">Month</span><input class="control" type="month" value="2026-11" /></label>
+    </div>
+    <table class="table">
+      <thead>
+        <tr><th>Category</th><th class="num">Expenses</th><th class="num">Total</th><th class="num">Share</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Housing</td><td class="num">1</td><td class="num">6.500.000 ₫</td><td class="num">95,5%</td></tr>
+        <tr><td>Food</td><td class="num">2</td><td class="num">205.000 ₫</td><td class="num">3,0%</td></tr>
+        <tr><td>Transport</td><td class="num">1</td><td class="num">50.000 ₫</td><td class="num">0,7%</td></tr>
+        <tr><td>Health</td><td class="num">1</td><td class="num">50.000 ₫</td><td class="num">0,7%</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td>Month total</td><td class="num">5</td><td class="num">6.805.000 ₫</td><td class="num">100,0%</td></tr>
+      </tfoot>
+    </table>
+  </main>
+  <p class="mockupNote">Wireframe (SPD-2): differs from monthly-summary.html by the "Share" column (category total as a percentage of the month total, one decimal, vi-VN format; footer always 100,0%) and by the missing "Categories" link. Rounded shares may not add up to exactly 100,0%. Empty month: "No expenses for this month."</p>
+</body>
+</html>
