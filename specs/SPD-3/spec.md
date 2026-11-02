@@ -3,7 +3,7 @@ issue: SPD-3
 title: Edit and delete an expense
 type: story
 status: draft            # draft | approved | implemented | cancelled
-version: 3
+version: 4
 design: [project-context/design/screens/expense-list.html, project-context/design/screens/expense-form-edit.html, project-context/design/screens/expense-form-errors.html, specs/SPD-3/wireframes/edit-expense-delete-confirm.html, specs/SPD-3/wireframes/expense-list-undo-toast.html, specs/SPD-3/wireframes/edit-expense-not-found.html]
 business_rules: [BR-1, BR-2, BR-3, BR-4, BR-5, BR-6, BR-7, BR-9, BR-10, BR-11, BR-12, BR-13, BR-20, BR-21]
 ---
@@ -171,6 +171,7 @@ Restore (API)
 |---|---|---|---|
 | — | Review comment (not a question): "Please use a modal dialog for the delete confirmation and add an 'Undo' toast for 5 seconds instead of permanent deletion" | Applied in version 2: modal dialog (AC-18, AC-19, AC-23), Undo toast for 5 seconds (AC-20, AC-21, AC-35–AC-41), restore API (AC-42–AC-45), BR-20 changed (now BR-21) | PR #9 comment by longnt-techleadjsc-vn, 2026-11-02 |
 | — | Jira comment (not a question): "The PR has some conflicts. Please resolve them" | Applied in version 3: the delete rules are renumbered BR-20 (edit) and BR-21 (delete and undo) because SPD-5 took BR-19 on `develop` | Jira comment by admin, 2026-11-02 |
+| — | Jira comments (not questions), repeated: "The PR has some conflicts. Please resolve them" | Applied in version 4: `develop` merged into `spec/SPD-3`, conflict in `rules.md` resolved (BR-1–BR-19 from `develop`, then BR-20 and BR-21) | Jira comments by admin, 2026-11-02 14:16 and 14:21 |
 
 ## Changelog
 | Version | Change |
@@ -180,3 +181,5 @@ Restore (API)
 | 2 | Review (PR #9, longnt-techleadjsc-vn): deletion is no longer permanent; a 5-second "Undo" toast restores the expense: AC-20–AC-22 updated, AC-35–AC-45 added, AC-34 extended to the restore endpoint, new wireframe `expense-list-undo-toast.html`, new `POST /api/v1/expenses/:id/restore`, deleted expenses kept and marked deleted, BR-20 changed in `rules.md`, glossary adds "Undo toast", A-4 and A-8 changed, A-10–A-12 added, scope updated. |
 | 3 | Jira comment (admin): resolve the PR conflict in `rules.md`. SPD-5 (merged to `develop`) took BR-19 for "over budget", so this spec's rules move to the next free numbers: edit rule BR-19 → BR-20, delete and undo rule BR-20 → BR-21. Front matter, AC-7, AC-20, AC-37, Business rules and Data and API impact updated; `rules.md` now also holds SPD-5's BR-19 with the same text as `develop`. No behaviour changes. |
 | 3 | PR #9 comment (longnt-techleadjsc-vn, modal dialog and 5-second Undo toast): no further change; it was already applied in version 2 (see the version 2 rows). |
+| 4 | Jira comments (admin, 14:16 and 14:21): `develop` merged into `spec/SPD-3`; the conflict in `rules.md` is resolved by keeping `develop`'s BR-1–BR-19 and adding this spec's BR-20 and BR-21 after them. The merge also brings in SPD-5's glossary terms and spec unchanged. No behaviour changes. |
+| 4 | PR #9 comment (longnt-techleadjsc-vn, modal dialog and 5-second Undo toast): no further change; it has been in the spec since version 2 (AC-18–AC-23, AC-35–AC-45, BR-21, wireframes `edit-expense-delete-confirm.html` and `expense-list-undo-toast.html`). |
