@@ -31,7 +31,8 @@ test.describe('monthly summary', () => {
     await page.goto('/');
     const nav = page.getByRole('navigation');
     await expect(page.getByRole('banner')).toContainText('Spendly');
-    await expect(nav.getByRole('link')).toHaveText(['Expenses', 'Summary']);
+    // SPD-4 adds the "Budgets" link after "Summary".
+    await expect(nav.getByRole('link')).toHaveText(['Expenses', 'Summary', 'Budgets']);
     await expect(nav.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
 
     await nav.getByRole('link', { name: 'Summary' }).click();

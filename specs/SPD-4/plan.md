@@ -71,3 +71,10 @@ documented in `project-context/architecture/data-model.md`. Expenses and categor
 | AI review: a save that finishes after a month change can overwrite the new month's data (`BudgetsPage.tsx` line 96) | Fixed. Each month load increments a `loadId` ref; the save keeps the id it started with and ignores its response or error if the id changed. Test: "AC-19: a save that finishes after a month change does not replace the new month". |
 | AI review: after a failed categories load, changing the month leaves the page on "Loading…" (`BudgetsPage.tsx` line 48) | Fixed. The categories error is kept in its own `categoriesFailed` state, which a month change does not reset, so the load error stays (AC-22). Test: "AC-22: keeps the load error after a month change when the categories failed to load". |
 | Human reviewer: "Need to fix these minors" | Fixed by the two items above. |
+
+## Revision 3
+| Feedback item | Resolution |
+|---|---|
+| Merge conflicts with `develop` (SPD-2 merged) in api.md, overview.md, server/src/app.ts, server/src/types.ts, web/src/App.tsx, App.test.tsx, api/client.ts, api/types.ts | Fixed in the merge commit by keeping both sides: `/summary` and `/budgets` routes, summary and budget types and client functions, both API sections. `App.tsx` uses SPD-2's `ExpensesScreen` (unmounts while another screen is shown, BR-6) and `SummaryPage`, plus the Budgets link and `BudgetsPage`. The SPD-4 App tests now navigate with SPD-2's `navigateTo` helper. |
+| Follow-up of the merge (see Risks: placeholder) | `SummaryPlaceholderPage.tsx` and its CSS deleted. SPD-2's header assertions (`App.test.tsx` AC-1, `e2e/summary.spec.ts` AC-1, `e2e/summary.qa.spec.ts` TC-1) now expect the "Budgets" link after "Summary", as SPD-4 AC-1 requires; the rest of those tests is unchanged. |
+| Admin (Jira): "The PR has some conflicts. Please resolve them." | Fixed by the items above. |
