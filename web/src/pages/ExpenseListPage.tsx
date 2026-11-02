@@ -2,15 +2,26 @@ import { useEffect, useState } from 'react';
 import { fetchCategories, fetchExpenses } from '../api/client';
 import type { Category, ExpenseListResponse } from '../api/types';
 import { ExpenseTable } from '../components/ExpenseTable';
-import { currentMonth } from '../lib/dates';
 import { formatMoney } from '../lib/money';
 import styles from './ExpenseListPage.module.css';
 
-const ALL_CATEGORIES = '';
+export const ALL_CATEGORIES = '';
 
-export function ExpenseListPage() {
-  const [month, setMonth] = useState(currentMonth);
-  const [categoryId, setCategoryId] = useState(ALL_CATEGORIES);
+export interface ExpenseListFilter {
+  /** "YYYY-MM" */
+  month: string;
+  /** Category id as a string, or `ALL_CATEGORIES`. */
+  categoryId: string;
+}
+
+interface ExpenseListPageProps {
+  filter: ExpenseListFilter;
+  onFilterChange: (filter: ExpenseListFilter) => void;
+  onAddExpense: () => void;
+}
+
+export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: ExpenseListPageProps) {
+  const { month, categoryId } = filter;
   const [categories, setCategories] = useState<Category[]>([]);
   const [list, setList] = useState<ExpenseListResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +52,9 @@ export function ExpenseListPage() {
     <section>
       <div className={styles.titleRow}>
         <h1 className={styles.title}>Expenses</h1>
+        <button type="button" className={styles.primaryButton} onClick={onAddExpense}>
+          Add expense
+        </button>
       </div>
 
       <div className={styles.toolbar}>
@@ -50,7 +64,7 @@ export function ExpenseListPage() {
             type="month"
             className={styles.control}
             value={month}
-            onChange={(e) => setMonth(e.target.value)}
+            onChange={(e) => onFilterChange({ ...filter, month: e.target.value })}
           />
         </label>
         <label className={styles.field}>
@@ -58,7 +72,7 @@ export function ExpenseListPage() {
           <select
             className={styles.control}
             value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
+            onChange={(e) => onFilterChange({ ...filter, categoryId: e.target.value })}
           >
             <option value={ALL_CATEGORIES}>All categories</option>
             {categories.map((category) => (

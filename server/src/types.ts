@@ -15,6 +15,9 @@ export interface Expense {
   note: string | null;
 }
 
+/** Body of POST /api/v1/expenses after validation. */
+export type NewExpense = Omit<Expense, 'id'>;
+
 /** Expenses of one category in one month (BR-13). */
 export interface CategorySummary {
   categoryId: number;

@@ -25,11 +25,12 @@ server/src/
   lib/                pure helpers (dates)
 server/test/          Vitest + Supertest tests, helpers.ts
 web/src/
-  main.tsx, App.tsx   entry and app shell (header with navigation + page; hash navigation `#/`, `#/summary`)
-  pages/              one component per screen (ExpenseListPage, SummaryPage)
+  main.tsx, App.tsx   entry and app shell (header with navigation + page). Hash navigation picks the screen
+                      (`#/` Expenses, `#/summary` Summary); the Expenses screen holds its view (list | add) and the list filter
+  pages/              one component per screen (ExpenseListPage, AddExpensePage, SummaryPage)
   components/         reusable presentational components (ExpenseTable, SummaryTable)
   api/                client.ts (fetch wrappers, ApiError) and types.ts (API shapes)
-  lib/                pure helpers (money, dates, share) with co-located tests
+  lib/                pure helpers (money, dates, share, expenseForm validation) with co-located tests
   styles/global.css   imports project-context/design/tokens.css, base element styles
 ```
 
@@ -46,4 +47,4 @@ web/src/
 - There is no migration tool. Schema changes go into `db/schema.ts`; an existing local DB is rebuilt with `npm run db:reset` (see runbook).
 
 ## Not present yet
-No router library (`App.tsx` switches between the two screens on `location.hash`), no state library, no auth, no build/deploy pipeline beyond CI.
+No router library (`App.tsx` switches between the Expenses and Summary screens on `location.hash`, and between the list and the Add expense form with a view state), no state library, no auth, no build/deploy pipeline beyond CI.

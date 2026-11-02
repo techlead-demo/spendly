@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
+import type { Expense } from './api/types';
 import styles from './App.module.css';
-import { ExpenseListPage } from './pages/ExpenseListPage';
+import { currentMonth } from './lib/dates';
+import { AddExpensePage } from './pages/AddExpensePage';
+import { ALL_CATEGORIES, ExpenseListPage, type ExpenseListFilter } from './pages/ExpenseListPage';
 import { SummaryPage } from './pages/SummaryPage';
 
 type Screen = 'expenses' | 'summary';
@@ -13,6 +16,32 @@ const SCREENS: { screen: Screen; hash: string; label: string }[] = [
 
 function screenFromHash(hash: string): Screen {
   return hash === '#/summary' ? 'summary' : 'expenses';
+}
+
+type View = 'list' | 'add';
+
+/**
+ * The Expenses screen: the list and the Add expense form. It unmounts while the Summary is shown,
+ * so coming back opens the list on the current month (BR-6).
+ */
+function ExpensesScreen() {
+  const [view, setView] = useState<View>('list');
+  // Kept here, not in the list page, so that Cancel returns to the same month and category.
+  const [filter, setFilter] = useState<ExpenseListFilter>(() => ({
+    month: currentMonth(),
+    categoryId: ALL_CATEGORIES,
+  }));
+
+  function handleSaved(expense: Expense) {
+    setFilter({ month: expense.date.slice(0, 7), categoryId: ALL_CATEGORIES });
+    setView('list');
+  }
+
+  return view === 'list' ? (
+    <ExpenseListPage filter={filter} onFilterChange={setFilter} onAddExpense={() => setView('add')} />
+  ) : (
+    <AddExpensePage onSaved={handleSaved} onCancel={() => setView('list')} />
+  );
 }
 
 export function App() {
@@ -41,7 +70,7 @@ export function App() {
           ))}
         </nav>
       </header>
-      <main className={styles.main}>{screen === 'summary' ? <SummaryPage /> : <ExpenseListPage />}</main>
+      <main className={styles.main}>{screen === 'summary' ? <SummaryPage /> : <ExpensesScreen />}</main>
     </div>
   );
 }

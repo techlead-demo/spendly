@@ -1,6 +1,6 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { monthRange } from '../lib/dates.js';
-import type { CategorySummary, Expense } from '../types.js';
+import type { CategorySummary, Expense, NewExpense } from '../types.js';
 
 interface ExpenseRow {
   id: number;
@@ -32,6 +32,7 @@ export interface ExpenseRepository {
   sumByMonth(month: string): number;
   /** Count and total per category that has expenses in the month, ordered by category id. */
   sumByCategory(month: string): CategorySummary[];
+  create(expense: NewExpense): Expense;
 }
 
 interface CategorySummaryRow {
@@ -60,6 +61,9 @@ export function createExpenseRepository(db: DatabaseSync): ExpenseRepository {
      GROUP BY e.category_id, c.name
      ORDER BY e.category_id`,
   );
+  const insert = db.prepare(
+    `INSERT INTO expenses (date, amount_minor, category_id, note) VALUES (?, ?, ?, ?) RETURNING ${columns}`,
+  );
 
   return {
     findByMonth({ month, categoryId }) {
@@ -84,6 +88,10 @@ export function createExpenseRepository(db: DatabaseSync): ExpenseRepository {
         count: row.count,
         totalMinor: row.total_minor,
       }));
+    },
+    create({ date, amountMinor, categoryId, note }) {
+      const row = insert.get(date, amountMinor, categoryId, note) as unknown as ExpenseRow;
+      return toExpense(row);
     },
   };
 }
