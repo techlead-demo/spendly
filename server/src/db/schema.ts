@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS expenses (
   date         TEXT    NOT NULL CHECK (date GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'),
   amount_minor INTEGER NOT NULL CHECK (amount_minor > 0),
   category_id  INTEGER NOT NULL REFERENCES categories (id),
-  note         TEXT
+  note         TEXT,
+  -- BR-21: a deleted expense is kept (1) so that Undo can restore it with the same id.
+  deleted      INTEGER NOT NULL DEFAULT 0 CHECK (deleted IN (0, 1))
 );
 
 CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses (date);

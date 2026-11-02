@@ -36,6 +36,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       body?.error?.message ?? res.statusText,
     );
   }
+  if (res.status === 204) {
+    return undefined as T;
+  }
   return (await res.json()) as T;
 }
 
@@ -58,6 +61,28 @@ export function createExpense(expense: NewExpense): Promise<Expense> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(expense),
   });
+}
+
+/** Rejects with an `ApiError` of status 404 when the expense does not exist or was deleted. */
+export function fetchExpense(id: number): Promise<Expense> {
+  return request<Expense>(`/expenses/${id}`);
+}
+
+export function updateExpense(id: number, expense: NewExpense): Promise<Expense> {
+  return request<Expense>(`/expenses/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(expense),
+  });
+}
+
+export function deleteExpense(id: number): Promise<void> {
+  return request<void>(`/expenses/${id}`, { method: 'DELETE' });
+}
+
+/** Undoes a delete (BR-21); resolves to the restored expense. */
+export function restoreExpense(id: number): Promise<Expense> {
+  return request<Expense>(`/expenses/${id}/restore`, { method: 'POST' });
 }
 
 export function fetchSummary(month: string): Promise<MonthlySummary> {

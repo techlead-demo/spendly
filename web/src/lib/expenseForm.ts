@@ -24,6 +24,19 @@ export const FIELD_MESSAGES: Record<ValidatedField, string> = {
   categoryId: 'Choose a category.',
 };
 
+/** Banner shown when Save finds invalid fields. */
+export const FIX_FIELDS_MESSAGE = 'Please fix the highlighted fields.';
+
+/** Form values of a stored expense, for the Edit expense form (SPD-3 A-1: the amount as plain digits). */
+export function expenseToFormValues(expense: NewExpense): ExpenseFormValues {
+  return {
+    date: expense.date,
+    amount: String(expense.amountMinor),
+    categoryId: String(expense.categoryId),
+    note: expense.note ?? '',
+  };
+}
+
 export type ExpenseFormResult = { ok: true; expense: NewExpense } | { ok: false; errors: ExpenseFormErrors };
 
 /**

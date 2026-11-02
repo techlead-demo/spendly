@@ -89,6 +89,8 @@ test.describe('over-budget warning', () => {
     await page.getByRole('button', { name: 'Save' }).click();
     await expect(page.getByText('Budgets saved.')).toBeVisible();
     await page.getByRole('link', { name: 'Expenses' }).click();
+    // Wait for the list: otherwise "Month" can still resolve to the Budgets screen's field, which already shows `month`.
+    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
     await showMonth(page, month);
 
     await expect(banner(page)).toContainText(`1 category is over budget in 01/${y}`);

@@ -20,9 +20,11 @@ interface ExpenseListPageProps {
   filter: ExpenseListFilter;
   onFilterChange: (filter: ExpenseListFilter) => void;
   onAddExpense: () => void;
+  /** Changing it reloads the list (e.g. after an Undo restored an expense). */
+  reloadKey?: number;
 }
 
-export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: ExpenseListPageProps) {
+export function ExpenseListPage({ filter, onFilterChange, onAddExpense, reloadKey = 0 }: ExpenseListPageProps) {
   const { month, categoryId } = filter;
   const [categories, setCategories] = useState<Category[]>([]);
   const [list, setList] = useState<ExpenseListResponse | null>(null);
@@ -49,10 +51,11 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
     return () => {
       cancelled = true;
     };
-  }, [month, categoryId]);
+  }, [month, categoryId, reloadKey]);
 
   // The banner covers the whole month whatever the category filter (BR-8, SPD-5 AC-12). It is extra
   // information: while it loads or when it fails, the list is shown without it and without an error.
+  // It reloads with the list, so an Undo that restores an expense also updates the banner (SPD-3).
   useEffect(() => {
     if (!month) return;
     let cancelled = false;
@@ -67,7 +70,7 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
     return () => {
       cancelled = true;
     };
-  }, [month]);
+  }, [month, reloadKey]);
 
   return (
     <section>

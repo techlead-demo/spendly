@@ -15,7 +15,7 @@ export interface Expense {
   note: string | null;
 }
 
-/** Body of POST /api/v1/expenses. */
+/** Body of POST /api/v1/expenses and PUT /api/v1/expenses/:id. */
 export type NewExpense = Omit<Expense, 'id'>;
 
 export interface ListResponse<T> {
