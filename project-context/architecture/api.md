@@ -12,7 +12,7 @@ All errors use this body and a matching status:
 
 | Status | code | When |
 |---|---|---|
-| 400 | `VALIDATION_ERROR` | Missing or malformed input |
+| 400 | `VALIDATION_ERROR` | Missing or malformed input, including a request body that is not valid JSON |
 | 404 | `NOT_FOUND` | Unknown route or resource |
 | 500 | `INTERNAL_ERROR` | Unexpected error (details only in the server log) |
 

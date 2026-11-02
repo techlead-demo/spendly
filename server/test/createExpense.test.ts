@@ -152,4 +152,15 @@ describe('POST /api/v1/expenses', () => {
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
   });
+
+  it('rejects a malformed JSON body with 400 VALIDATION_ERROR', async () => {
+    const res = await request(context.app)
+      .post('/api/v1/expenses')
+      .set('Content-Type', 'application/json')
+      .send('{"date":');
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toEqual({ code: 'VALIDATION_ERROR', message: 'request body must be valid JSON' });
+    expect(countExpenses()).toBe(0);
+  });
 });
