@@ -7,6 +7,7 @@ import { createExpenseRepository } from './repositories/expenseRepository.js';
 import { budgetsRouter } from './routes/budgets.js';
 import { categoriesRouter } from './routes/categories.js';
 import { expensesRouter } from './routes/expenses.js';
+import { summaryRouter } from './routes/summary.js';
 import { createBudgetService } from './services/budgetService.js';
 import { createExpenseService } from './services/expenseService.js';
 
@@ -27,6 +28,7 @@ export function createApp(db: DatabaseSync, { now = () => new Date() }: AppOptio
   const api = express.Router();
   api.use('/categories', categoriesRouter(categories));
   api.use('/expenses', expensesRouter(expenses));
+  api.use('/summary', summaryRouter(expenses));
   api.use('/budgets', budgetsRouter(budgets));
   app.use('/api/v1', api);
 

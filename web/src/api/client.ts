@@ -6,6 +6,7 @@ import type {
   ExpenseListResponse,
   ListResponse,
   MonthBudgets,
+  MonthlySummary,
   NewExpense,
 } from './types';
 
@@ -56,6 +57,10 @@ export function createExpense(expense: NewExpense): Promise<Expense> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(expense),
   });
+}
+
+export function fetchSummary(month: string): Promise<MonthlySummary> {
+  return request<MonthlySummary>(`/summary?${new URLSearchParams({ month })}`);
 }
 
 export function fetchBudgets(month: string): Promise<MonthBudgets> {

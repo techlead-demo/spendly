@@ -26,6 +26,22 @@ export interface ExpenseListResponse extends ListResponse<Expense> {
   monthTotalMinor: number;
 }
 
+export interface CategorySummary {
+  categoryId: number;
+  categoryName: string;
+  count: number;
+  /** Integer total in VND minor units. */
+  totalMinor: number;
+}
+
+export interface MonthlySummary {
+  /** "YYYY-MM" */
+  month: string;
+  items: CategorySummary[];
+  monthCount: number;
+  monthTotalMinor: number;
+}
+
 /** The budget of one category in effect for a month; `amountMinor` is null when there is no budget (no limit). */
 export interface Budget {
   categoryId: number;

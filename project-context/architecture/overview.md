@@ -25,13 +25,13 @@ server/src/
   lib/                pure helpers (dates)
 server/test/          Vitest + Supertest tests, helpers.ts
 web/src/
-  main.tsx, App.tsx   entry and app shell (header navigation + page); App holds the screen (from the URL hash),
-                      the expenses view (list | add) and the list filter
-  pages/              one component per screen (ExpenseListPage, AddExpensePage, BudgetsPage,
-                      SummaryPlaceholderPage until SPD-2 is merged)
-  components/         reusable presentational components (ExpenseTable)
+  main.tsx, App.tsx   entry and app shell (header with navigation + page). Hash navigation picks the screen
+                      (`#/` Expenses, `#/summary` Summary, `#/budgets` Budgets); the Expenses screen holds its view
+                      (list | add) and the list filter
+  pages/              one component per screen (ExpenseListPage, AddExpensePage, SummaryPage, BudgetsPage)
+  components/         reusable presentational components (ExpenseTable, SummaryTable)
   api/                client.ts (fetch wrappers, ApiError) and types.ts (API shapes)
-  lib/                pure helpers (money, dates, expenseForm validation) with co-located tests
+  lib/                pure helpers (money, dates, share, expenseForm validation) with co-located tests
   styles/global.css   imports project-context/design/tokens.css, base element styles
 ```
 
@@ -49,12 +49,12 @@ web/src/
 
 ## Navigation
 Hash based, no router dependency: `#/` Expenses, `#/summary` Summary, `#/budgets` Budgets. The header links set the
-hash; `App` follows `hashchange`. Within Expenses, `App` switches between the list and the Add expense form with a view
-state.
+hash; `App` follows `hashchange`. The Expenses screen switches between the list and the Add expense form with a view
+state; it unmounts while another screen is shown, so coming back opens the list on the current month (BR-6).
 
 ## Clock
 `createApp(db, { now })` takes the clock for rules that depend on today (BR-18: budgets only from the current month).
 It defaults to the system clock; server tests pass a fixed date.
 
 ## Not present yet
-No router library, no state library, no auth, no build/deploy pipeline beyond CI.
+No router library (see Navigation), no state library, no auth, no build/deploy pipeline beyond CI.

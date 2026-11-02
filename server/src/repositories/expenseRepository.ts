@@ -1,6 +1,6 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { monthRange } from '../lib/dates.js';
-import type { Expense, NewExpense } from '../types.js';
+import type { CategorySummary, Expense, NewExpense } from '../types.js';
 
 interface ExpenseRow {
   id: number;
@@ -30,7 +30,16 @@ export interface ExpenseRepository {
   /** Expenses of the month, newest date first (ties: newest id first). */
   findByMonth(filter: ExpenseFilter): Expense[];
   sumByMonth(month: string): number;
+  /** Count and total per category that has expenses in the month, ordered by category id. */
+  sumByCategory(month: string): CategorySummary[];
   create(expense: NewExpense): Expense;
+}
+
+interface CategorySummaryRow {
+  category_id: number;
+  category_name: string;
+  count: number;
+  total_minor: number;
 }
 
 export function createExpenseRepository(db: DatabaseSync): ExpenseRepository {
@@ -44,6 +53,13 @@ export function createExpenseRepository(db: DatabaseSync): ExpenseRepository {
   );
   const sumByMonth = db.prepare(
     'SELECT COALESCE(SUM(amount_minor), 0) AS total FROM expenses WHERE date >= ? AND date < ?',
+  );
+  const sumByCategory = db.prepare(
+    `SELECT e.category_id, c.name AS category_name, COUNT(*) AS count, SUM(e.amount_minor) AS total_minor
+     FROM expenses e JOIN categories c ON c.id = e.category_id
+     WHERE e.date >= ? AND e.date < ?
+     GROUP BY e.category_id, c.name
+     ORDER BY e.category_id`,
   );
   const insert = db.prepare(
     `INSERT INTO expenses (date, amount_minor, category_id, note) VALUES (?, ?, ?, ?) RETURNING ${columns}`,
@@ -62,6 +78,16 @@ export function createExpenseRepository(db: DatabaseSync): ExpenseRepository {
       const { from, to } = monthRange(month);
       const { total } = sumByMonth.get(from, to) as { total: number };
       return total;
+    },
+    sumByCategory(month) {
+      const { from, to } = monthRange(month);
+      const rows = sumByCategory.all(from, to) as unknown as CategorySummaryRow[];
+      return rows.map((row) => ({
+        categoryId: row.category_id,
+        categoryName: row.category_name,
+        count: row.count,
+        totalMinor: row.total_minor,
+      }));
     },
     create({ date, amountMinor, categoryId, note }) {
       const row = insert.get(date, amountMinor, categoryId, note) as unknown as ExpenseRow;
