@@ -14,3 +14,21 @@ export interface Expense {
   categoryId: number;
   note: string | null;
 }
+
+/** Expenses of one category in one month (BR-13). */
+export interface CategorySummary {
+  categoryId: number;
+  categoryName: string;
+  count: number;
+  /** Integer total in minor units of VND. */
+  totalMinor: number;
+}
+
+export interface MonthlySummary {
+  /** "YYYY-MM" */
+  month: string;
+  /** Categories with at least one expense, largest total first; equal totals in category order. */
+  items: CategorySummary[];
+  monthCount: number;
+  monthTotalMinor: number;
+}
