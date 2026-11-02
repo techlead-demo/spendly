@@ -10,7 +10,7 @@ import { createExpenseService } from './services/expenseService.js';
 /** Builds the Express app on top of an open database. Tests call this with an in-memory database. */
 export function createApp(db: DatabaseSync): express.Express {
   const categories = createCategoryRepository(db);
-  const expenses = createExpenseService(createExpenseRepository(db));
+  const expenses = createExpenseService(createExpenseRepository(db), categories);
 
   const app = express();
   app.use(express.json());
