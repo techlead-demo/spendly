@@ -3,7 +3,12 @@
 - **Expense**: one payment the user made: a date, an amount, a category and an optional note.
 - **Amount**: the money value of an expense, always positive, in VND.
 - **Minor unit**: the smallest unit of a currency. VND has no subunit, so 1 minor unit = 1 đồng. Amounts are stored and sent as integer minor units (`amountMinor`).
-- **Category**: a kind of spending (Food, Transport, ...). Every expense has exactly one.
+- **Category**: a kind of spending (Food, Transport, ...). Every expense has exactly one. The user can add, rename, retire and restore categories.
+- **Default categories**: the six categories a new database starts with: Food, Transport, Housing, Health, Entertainment, Other.
+- **Category order**: the order categories are created in: the default categories first, then added categories, oldest first.
+- **Active category**: a category that can be chosen for a new or edited expense.
+- **Retired category**: a category the user no longer uses. It is not offered for new expenses or as a new category of an edited expense, but existing expenses keep it. It can be restored to active.
+- **Categories screen**: the screen where the user adds, renames, retires and restores categories.
 - **Note**: optional free text describing an expense ("Groceries at Co.opmart").
 - **Date (expense date)**: the local calendar day the expense happened, `YYYY-MM-DD`, no time or time zone.
 - **Month**: a calendar month, `YYYY-MM`. An expense belongs to the month of its date.
