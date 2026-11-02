@@ -23,6 +23,21 @@ Fixed rows (inserted by `seedCategories` on every startup if missing):
 
 Index: `idx_expenses_date` on `date`.
 
+## budgets
+One row per change of a category's budget: set (amount) or removed (`NULL`) from `from_month` onward (BR-16, BR-17).
+| Column | Type | Constraints | API field |
+|---|---|---|---|
+| category_id | INTEGER | not null, references `categories(id)` | `categoryId` |
+| from_month | TEXT | not null, `YYYY-MM` (CHECK on format); first month the row applies to | `month` of `PUT /api/v1/budgets` |
+| amount_minor | INTEGER | nullable, `> 0` when set; VND minor units; `NULL` = budget removed (no limit) | `amountMinor` (`number \| null`) |
+
+Primary key: `(category_id, from_month)`. Setting or removing a budget from month M upserts the row `(category, M)`;
+rows of other months are never changed.
+
+**Budget in effect** for a category in month X: `amount_minor` of that category's row with the greatest
+`from_month <= X`; no such row (or a `NULL` amount) means no budget. `budgetRepository.findInEffect` implements this;
+SPD-5 and SPD-8 must use the same rule.
+
 ## Invariants
 - Money is an integer; never store or compute it as a float.
 - A month is queried as the half-open range `date >= 'YYYY-MM-01' AND date < '<next month>-01'` (`monthRange` in `server/src/lib/dates.ts`).

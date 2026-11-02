@@ -91,3 +91,59 @@ Errors: 400 `VALIDATION_ERROR` for any rule above, nothing is stored; the messag
 ```json
 { "error": { "code": "VALIDATION_ERROR", "message": "categoryId 99 does not exist" } }
 ```
+
+## GET /api/v1/budgets
+The budget in effect for every category in one month (BR-16): the budget set or removed for that category from the
+latest start month that is not after `month`. All categories, ordered by `id`.
+
+Query parameters:
+| Name | Required | Format | Notes |
+|---|---|---|---|
+| `month` | yes | `YYYY-MM` | 400 `VALIDATION_ERROR` if missing or malformed (same check as `GET /api/v1/expenses`) |
+
+Request: `GET /api/v1/budgets?month=2026-12`
+
+Response 200:
+```json
+{
+  "month": "2026-12",
+  "items": [
+    { "categoryId": 1, "amountMinor": 700000 },
+    { "categoryId": 2, "amountMinor": null },
+    { "categoryId": 3, "amountMinor": null },
+    { "categoryId": 4, "amountMinor": null },
+    { "categoryId": 5, "amountMinor": 300000 },
+    { "categoryId": 6, "amountMinor": null }
+  ]
+}
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `month` | string | The requested month |
+| `items` | Budget[] | `{ categoryId, amountMinor }`; `amountMinor` is an integer (VND minor units) or `null` for no budget (no limit) |
+
+## PUT /api/v1/budgets
+Sets or removes the budget of one or more categories from `month` onward (BR-16, BR-17, BR-18). Earlier months and
+budgets set or removed from a later month are not changed. Categories not listed keep their budgets. All items are
+stored, or none.
+
+Request body:
+| Field | Required | Type | Rules |
+|---|---|---|---|
+| `month` | yes | string | `YYYY-MM`; the current month (server local date) or later |
+| `items` | yes | array | At least one item; each category at most once |
+| `items[].categoryId` | yes | integer (JSON number) | Id of an existing category |
+| `items[].amountMinor` | yes | integer or `null` | `1` to `9007199254740991` sets the budget; `null` removes it. Strings and decimals are rejected |
+
+Request:
+```json
+{ "month": "2027-01", "items": [{ "categoryId": 1, "amountMinor": 800000 }, { "categoryId": 5, "amountMinor": null }] }
+```
+
+Response 200: the budgets of `month` after the change, as in `GET /api/v1/budgets`.
+
+Errors: 400 `VALIDATION_ERROR` for any rule above, nothing is stored, e.g.
+```json
+{ "error": { "code": "VALIDATION_ERROR", "message": "month must be the current month (2026-11) or later" } }
+```
