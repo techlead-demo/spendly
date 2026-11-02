@@ -1,7 +1,7 @@
 ---
 issue: SPD-3
 spec_version: 4
-revision: 0
+revision: 2
 ---
 
 # Implementation plan — SPD-3
@@ -48,7 +48,8 @@ existing local database needs `npm run db:reset` (no migration tool, see runbook
 |---|---|
 | AC-1 | web/src/components/ExpenseTable.test.tsx; e2e/edit-expense.spec.ts |
 | AC-2, AC-3 | web/src/pages/EditExpensePage.test.tsx; e2e/edit-expense.spec.ts (AC-2) |
-| AC-4 – AC-6, AC-9, AC-11 | web/src/App.test.tsx; e2e/edit-expense.spec.ts (AC-4, AC-5, AC-6, AC-11) |
+| AC-4, AC-6, AC-9, AC-11 | web/src/App.test.tsx; e2e/edit-expense.spec.ts (AC-4, AC-6, AC-11) |
+| AC-5 | server/test/editExpense.test.ts (summary rows); e2e/edit-expense.spec.ts |
 | AC-7, AC-8, AC-17 | server/test/editExpense.test.ts; web/src/pages/EditExpensePage.test.tsx |
 | AC-10, AC-12 – AC-16 | web/src/pages/EditExpensePage.test.tsx |
 | AC-18, AC-19, AC-22 – AC-28 | web/src/pages/EditExpensePage.test.tsx |
@@ -64,3 +65,11 @@ existing local database needs `npm run db:reset` (no migration tool, see runbook
 - Existing local databases miss the new column until `npm run db:reset`.
 - The 5-second window is enforced by the UI only (spec A-10).
 - No new dependency.
+
+## Revision 2
+| Feedback item | Resolution |
+|---|---|
+| QA D-1 / review: Edit URL with id 0 shows the load error (AC-24) | Fixed. `EditExpensePage` shows the not-found state without a request for an id that is not a positive safe integer. The route keeps `\d+` so such links still open the Edit screen with "This expense no longer exists." (QA TC-50), instead of falling back to the list. |
+| Review: Cancel enabled during Save (AC-11) | Fixed. Cancel is disabled while Save or Delete runs, and a Save that resolves after the page unmounted (e.g. header navigation) no longer calls `onSaved`. |
+| Review: AC-41 keyboard test is weak | Fixed. The test asserts Undo is an enabled native button with tabIndex 0, no `tabindex` attribute, and in the document's tabbable elements. `userEvent.tab()` is not used because `@testing-library/user-event` is not a dependency and the fix does not justify adding one. |
+| Review nit: plan maps AC-5 to App.test | Fixed. The mapping row now names server/test/editExpense.test.ts and e2e. |
