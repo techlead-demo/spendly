@@ -12,7 +12,7 @@ Every acceptance criterion has at least one automated test, and the test name or
 `npm test` runs both workspaces. Run one workspace with `npm test --workspace server` (or `web`); one file with `npm test --workspace server -- test/expenses.test.ts`.
 
 ## Server tests
-- Build a fresh app per test with `createTestContext()` from `server/test/helpers.ts`: in-memory DB with schema and the fixed categories, **no** sample expenses.
+- Build a fresh app per test with `createTestContext()` from `server/test/helpers.ts`: in-memory DB with schema and the six default categories, **no** sample expenses.
 - Insert exactly the data the test needs with `insertExpense(db, {...})` (add similar helpers for new tables). Use fixed dates (e.g. `2026-10-15`), not "today".
 - Call the API with Supertest: `await request(app).get('/api/v1/expenses').query({ month: '2026-10' })`.
 - Assert status and the full body (`toEqual`) for the main case; assert `error.code` for errors.
@@ -28,9 +28,14 @@ Every acceptance criterion has at least one automated test, and the test name or
 - The Playwright `webServer` starts the API with `DB_PATH=:memory:` (fresh sample data each run) and the Vite dev server, on `API_PORT` / `WEB_PORT`.
 - Sample data dates are relative to today; assert on stable facts (notes such as "Monthly rent", counts), not on exact totals or dates.
 - Tests that create data must not depend on test order; create what you need inside the test and find it by its unique note.
+- Other e2e tests assume the six default categories. Tests that add, rename or retire categories go in
+  `e2e/categories.spec.ts`, which the `categories` project in `playwright.config.ts` runs after all other tests; give
+  added categories unique names (names are unique, BR-23).
 - Use role and label locators and web-first assertions (`await expect(locator).toBeVisible()`); no fixed `waitForTimeout`.
 - Name files after the screen or feature: `e2e/expense-list.spec.ts`.
 
 ## Test data
-- Fixed categories: 1 Food, 2 Transport, 3 Housing, 4 Health, 5 Entertainment, 6 Other.
+- Default categories of a new database (all active): 1 Food, 2 Transport, 3 Housing, 4 Health, 5 Entertainment,
+  6 Other. Server tests add and retire more through the API (`POST /api/v1/categories`, `…/:id/retire`); web
+  fixtures need `status` and `expenseCount`.
 - Amounts are realistic VND integers (`45_000`, `6_500_000`), never floats.

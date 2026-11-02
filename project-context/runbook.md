@@ -40,11 +40,12 @@ Vitest in `server` (Supertest against an in-memory DB) and `web` (jsdom). One wo
 ```
 npx playwright test
 ```
-Playwright starts the API with `DB_PATH=:memory:` and the web dev server on `API_PORT` / `WEB_PORT`, then runs `e2e/` in Chromium. If servers are already running on those ports (outside CI) they are reused. List tests without running: `npx playwright test --list`. Report after a failure: `npx playwright show-report`.
+Playwright starts the API with `DB_PATH=:memory:` and the web dev server on `API_PORT` / `WEB_PORT`, then runs `e2e/` in Chromium. `e2e/categories.spec.ts` runs in its own Playwright project (`categories`) after all other tests, because it adds, renames and retires categories in the shared database. If servers are already running on those ports (outside CI) they are reused. List tests without running: `npx playwright test --list`. Report after a failure: `npx playwright show-report`.
 
 ## Seed data
-- A new database (missing file, or `:memory:`) gets the six fixed categories and 25 sample expenses dated 0 to 57 days before today.
-- Categories are re-inserted on every start if missing; sample expenses only when the database is new.
+- A new database (missing file, or `:memory:`) gets the six default categories and 25 sample expenses dated 0 to 57 days before today.
+- Default categories are inserted only when the `categories` table is empty, and sample expenses only when the database is new, so added, renamed and retired categories survive a restart.
+- An existing database from before SPD-6 is migrated at startup (column `categories.retired`); no reset is needed.
 
 ## Reset the database
 ```
