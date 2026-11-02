@@ -18,4 +18,6 @@
 - **Budget**: the amount the user plans to spend in one category in a month. It carries forward to later months until changed or removed; a category without a budget has no limit.
 - **Budget in effect**: the budget that applies to a category in a given month: the one set from the latest month not after that month, or none.
 - **Budgets screen**: the screen where the user views a month's budgets per category and sets, changes or removes them for the current or a later month.
+- **Over budget**: a category whose category total for a month is greater than its budget in effect for that month; the difference is the **amount over**.
+- **Over-budget warning**: the banner on the expense list that lists the selected month's over-budget categories with spent, budget and amount over.
 - **Sample data**: the expenses a new database is created with, so the app is not empty on first use.
