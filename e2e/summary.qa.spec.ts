@@ -70,13 +70,12 @@ async function addExpense(page: Page, values: { date: string; amount: string; ca
 }
 
 test.describe('monthly summary (QA)', () => {
-  test('TC-1 (AC-1): the active link is underlined and "Categories" is not shown', async ({ page }) => {
+  test('TC-1 (AC-1): the active link is underlined', async ({ page }) => {
     await page.goto('/#/summary');
     const nav = page.getByRole('navigation');
 
-    // SPD-4 AC-1 adds the "Budgets" link after "Summary".
-    await expect(page.getByRole('banner')).toHaveText(/^\s*Spendly\s*Expenses\s*Summary\s*Budgets\s*$/);
-    await expect(nav.getByRole('link', { name: 'Categories' })).toHaveCount(0);
+    // SPD-4 AC-1 adds the "Budgets" link after "Summary"; SPD-6 AC-1 adds "Categories" last.
+    await expect(page.getByRole('banner')).toHaveText(/^\s*Spendly\s*Expenses\s*Summary\s*Budgets\s*Categories\s*$/);
     const active = nav.getByRole('link', { name: 'Summary' });
     await expect(active).toHaveAttribute('aria-current', 'page');
     await expect(active).toHaveCSS('border-bottom-style', 'solid');

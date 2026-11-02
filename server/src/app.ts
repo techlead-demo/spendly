@@ -9,6 +9,7 @@ import { categoriesRouter } from './routes/categories.js';
 import { expensesRouter } from './routes/expenses.js';
 import { summaryRouter } from './routes/summary.js';
 import { createBudgetService } from './services/budgetService.js';
+import { createCategoryService } from './services/categoryService.js';
 import { createExpenseService } from './services/expenseService.js';
 
 export interface AppOptions {
@@ -27,7 +28,7 @@ export function createApp(db: DatabaseSync, { now = () => new Date() }: AppOptio
   app.use(express.json());
 
   const api = express.Router();
-  api.use('/categories', categoriesRouter(categories));
+  api.use('/categories', categoriesRouter(createCategoryService(categories)));
   api.use('/expenses', expensesRouter(expenses));
   api.use('/summary', summaryRouter(expenses));
   api.use('/budgets', budgetsRouter(budgets));

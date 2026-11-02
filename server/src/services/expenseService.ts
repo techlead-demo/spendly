@@ -17,14 +17,15 @@ export interface ExpenseService {
   summarizeMonth(month: string): MonthlySummary;
   /**
    * Records an expense whose fields the route has validated and normalised (BR-11: note trimmed, blank → null).
-   * Throws a validation error for an unknown category (BR-2).
+   * Throws a validation error for an unknown or retired category (BR-2, BR-24).
    */
   createExpense(expense: NewExpense): Expense;
   /** Throws 404 NOT_FOUND for an unknown or deleted expense. */
   getExpense(id: number): Expense;
   /**
    * BR-20: replaces the fields of an expense under the same rules as recording; id and recording order stay.
-   * Throws a validation error for an unknown category and 404 NOT_FOUND for an unknown or deleted expense.
+   * Throws a validation error for an unknown category or another retired category than the expense's own (BR-24),
+   * and 404 NOT_FOUND for an unknown or deleted expense.
    */
   updateExpense(id: number, expense: NewExpense): Expense;
   /** BR-21: marks the expense deleted (kept for Undo). Throws 404 NOT_FOUND for an unknown or deleted expense. */
@@ -41,9 +42,14 @@ export function createExpenseService(
   expenses: ExpenseRepository,
   categories: CategoryRepository,
 ): ExpenseService {
-  function checkCategory(categoryId: number) {
-    if (!categories.exists(categoryId)) {
+  /** BR-2, BR-24: the category exists and is active, unless it is the category the expense already has. */
+  function checkCategory(categoryId: number, currentCategoryId?: number) {
+    const category = categories.findById(categoryId);
+    if (!category) {
       throw validationError(`categoryId ${categoryId} does not exist`);
+    }
+    if (category.status === 'retired' && categoryId !== currentCategoryId) {
+      throw validationError(`categoryId ${categoryId} is retired`);
     }
   }
 
@@ -56,7 +62,7 @@ export function createExpenseService(
     },
     summarizeMonth(month) {
       // The repository returns rows in category order and Array.prototype.sort is stable,
-      // so equal totals keep the fixed category order.
+      // so equal totals keep the category order (BR-22).
       const items = expenses.sumByCategory(month).sort((a, b) => b.totalMinor - a.totalMinor);
       return {
         month,
@@ -76,8 +82,9 @@ export function createExpenseService(
     },
     updateExpense(id, expense) {
       // An unknown expense is reported before an unknown category: there is nothing to correct.
-      if (!expenses.findById(id)) throw expenseNotFound(id);
-      checkCategory(expense.categoryId);
+      const current = expenses.findById(id);
+      if (!current) throw expenseNotFound(id);
+      checkCategory(expense.categoryId, current.categoryId);
       const updated = expenses.update(id, expense);
       if (!updated) throw expenseNotFound(id);
       return updated;

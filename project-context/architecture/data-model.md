@@ -6,11 +6,22 @@ Foreign keys are enforced (`PRAGMA foreign_keys = ON`).
 ## categories
 | Column | Type | Constraints | API field |
 |---|---|---|---|
-| id | INTEGER | primary key; fixed values 1–6 | `id` |
-| name | TEXT | not null, unique | `name` |
+| id | INTEGER | primary key; 1–6 are the default categories, added categories get the next id | `id` |
+| name | TEXT | not null, unique; trimmed, 1–40 characters, unique ignoring letter case (BR-23) | `name` |
+| retired | INTEGER | not null, default `0`, `0` or `1`; `1` = retired (BR-24) | `status` (`"active"` / `"retired"`) |
 
-Fixed rows (inserted by `seedCategories` on every startup if missing):
-1 Food, 2 Transport, 3 Housing, 4 Health, 5 Entertainment, 6 Other.
+Index: `idx_categories_name_nocase` (unique) on `name COLLATE NOCASE`, a backstop of BR-23 for ASCII letter case;
+`categoryService` checks uniqueness with full Unicode case folding before writing.
+
+Categories are never deleted, so ids are never reused; the category order (BR-22) is `id`. Renaming changes the
+row in place, so every expense (which refers to `category_id`) shows the new name. Retiring or restoring only flips
+`retired`; no expense or budget changes. `GET /api/v1/categories` derives `expenseCount` from the non-deleted
+expenses of the category.
+
+Default rows, inserted by `seedCategories` only when the table is empty (a new database), so a renamed or retired
+default category stays as the user left it after a restart: 1 Food, 2 Transport, 3 Housing, 4 Health,
+5 Entertainment, 6 Other. A database from before SPD-6 gets the `retired` column (all categories active) from
+`migrate` in `server/src/db/schema.ts` at startup.
 
 ## expenses
 | Column | Type | Constraints | API field |
@@ -49,6 +60,8 @@ SPD-5 and SPD-8 must use the same rule.
 - A month is queried as the half-open range `date >= 'YYYY-MM-01' AND date < '<next month>-01'` (`monthRange` in `server/src/lib/dates.ts`).
 - Ordering of expense lists: `date DESC, id DESC`.
 - Deleted expenses (`deleted = 1`) count in no list, total or summary.
+- At least one category is active (BR-25); a new expense, a changed expense category and a budget need an active
+  category (BR-24, enforced by the services).
 
 ## Sample data
 `seedSampleExpenses(db, today)` in `server/src/db/seed.ts`: 25 expenses across all categories, some without a note, dated 0 to 57 days before `today` (never in the future).

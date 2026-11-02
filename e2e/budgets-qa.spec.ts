@@ -45,8 +45,8 @@ test.describe('SPD-4 QA: budgets', () => {
     const header = page.getByRole('banner');
     const nav = page.getByRole('navigation');
     await expect(header).toContainText('Spendly');
-    await expect(nav.getByRole('link')).toHaveText(['Expenses', 'Summary', 'Budgets']);
-    await expect(header.getByText('Categories')).toHaveCount(0);
+    // SPD-6 AC-1 adds the "Categories" link last.
+    await expect(nav.getByRole('link')).toHaveText(['Expenses', 'Summary', 'Budgets', 'Categories']);
     await expect(nav.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
 
     await nav.getByRole('link', { name: 'Summary' }).click();

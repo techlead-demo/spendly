@@ -1,8 +1,14 @@
 /** API resource shapes (camelCase, as sent over JSON). */
 
+/** BR-24: only active categories can be chosen for new expenses and get budgets. */
+export type CategoryStatus = 'active' | 'retired';
+
 export interface Category {
   id: number;
   name: string;
+  status: CategoryStatus;
+  /** Number of expenses in the category over all months; deleted expenses (BR-21) are not counted. */
+  expenseCount: number;
 }
 
 export interface Expense {
@@ -68,6 +74,6 @@ export interface OverBudgetCategory {
 export interface MonthOverBudget {
   /** "YYYY-MM" */
   month: string;
-  /** Largest `overMinor` first; equal amounts in category order (BR-5). */
+  /** Largest `overMinor` first; equal amounts in category order (BR-22). */
   items: OverBudgetCategory[];
 }

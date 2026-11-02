@@ -47,6 +47,32 @@ export async function fetchCategories(): Promise<Category[]> {
   return items;
 }
 
+/** Adds an active category (BR-22); a name that breaks BR-23 rejects with a 400 `ApiError`. */
+export function addCategory(name: string): Promise<Category> {
+  return request<Category>('/categories', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function renameCategory(id: number, name: string): Promise<Category> {
+  return request<Category>(`/categories/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+}
+
+/** Retiring the only active category rejects with a 400 `ApiError` (BR-25). */
+export function retireCategory(id: number): Promise<Category> {
+  return request<Category>(`/categories/${id}/retire`, { method: 'POST' });
+}
+
+export function restoreCategory(id: number): Promise<Category> {
+  return request<Category>(`/categories/${id}/restore`, { method: 'POST' });
+}
+
 export function fetchExpenses(month: string, categoryId?: number): Promise<ExpenseListResponse> {
   const params = new URLSearchParams({ month });
   if (categoryId !== undefined) {

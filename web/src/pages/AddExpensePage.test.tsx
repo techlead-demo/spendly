@@ -11,12 +11,12 @@ vi.mock('../api/client', async (importActual) => ({
 }));
 
 const CATEGORIES: Category[] = [
-  { id: 1, name: 'Food' },
-  { id: 2, name: 'Transport' },
-  { id: 3, name: 'Housing' },
-  { id: 4, name: 'Health' },
-  { id: 5, name: 'Entertainment' },
-  { id: 6, name: 'Other' },
+  { id: 1, name: 'Food', status: 'active', expenseCount: 0 },
+  { id: 2, name: 'Transport', status: 'active', expenseCount: 0 },
+  { id: 3, name: 'Housing', status: 'active', expenseCount: 0 },
+  { id: 4, name: 'Health', status: 'active', expenseCount: 0 },
+  { id: 5, name: 'Entertainment', status: 'active', expenseCount: 0 },
+  { id: 6, name: 'Other', status: 'active', expenseCount: 0 },
 ];
 
 const FIX_FIELDS = 'Please fix the highlighted fields.';
@@ -256,5 +256,50 @@ describe('AddExpensePage', () => {
 
     expect(screen.getByText(CATEGORY_ERROR)).toBeInTheDocument();
     expect(createExpense).not.toHaveBeenCalled();
+  });
+
+  describe('user-managed categories (SPD-6)', () => {
+    function optionNames() {
+      return within(field('Category')).getAllByRole('option').map((option) => option.textContent);
+    }
+
+    it('AC-6: offers an added category last, and saves an expense with it', async () => {
+      vi.mocked(fetchCategories).mockResolvedValue([
+        ...CATEGORIES,
+        { id: 7, name: 'Coffee', status: 'active', expenseCount: 0 },
+      ]);
+      const { onSaved } = await renderPage();
+
+      expect(optionNames()).toEqual([
+        'Choose a category',
+        'Food',
+        'Transport',
+        'Housing',
+        'Health',
+        'Entertainment',
+        'Other',
+        'Coffee',
+      ]);
+      await fillValid();
+      setField('Category', '7');
+      clickSave();
+
+      await waitFor(() => expect(onSaved).toHaveBeenCalled());
+      expect(createExpense).toHaveBeenCalledWith(expect.objectContaining({ categoryId: 7 }));
+    });
+
+    it('AC-19, AC-22: does not offer a retired category, and offers it again once restored', async () => {
+      const gym: Category = { id: 8, name: 'Gym', status: 'retired', expenseCount: 6 };
+      vi.mocked(fetchCategories).mockResolvedValue([...CATEGORIES, gym]);
+      const { unmount } = render(<AddExpensePage onSaved={vi.fn()} onCancel={vi.fn()} />);
+      await screen.findByRole('option', { name: 'Other' });
+
+      expect(optionNames()).not.toContain('Gym');
+
+      unmount();
+      vi.mocked(fetchCategories).mockResolvedValue([...CATEGORIES, { ...gym, status: 'active' }]);
+      await renderPage();
+      expect(optionNames().at(-1)).toBe('Gym');
+    });
   });
 });

@@ -47,7 +47,7 @@ test.describe('budgets', () => {
   test('AC-1, AC-2, AC-3: the header links to the Budgets screen on the current month', async ({ page }) => {
     await page.goto('/');
     const nav = page.getByRole('navigation');
-    await expect(nav.getByRole('link')).toHaveText(['Expenses', 'Summary', 'Budgets']);
+    await expect(nav.getByRole('link')).toHaveText(['Expenses', 'Summary', 'Budgets', 'Categories']);
     await expect(nav.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
 
     await openBudgets(page);

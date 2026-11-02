@@ -31,8 +31,8 @@ vi.mock('./api/client', async (importActual) => ({
 }));
 
 const CATEGORIES: Category[] = [
-  { id: 1, name: 'Food' },
-  { id: 4, name: 'Health' },
+  { id: 1, name: 'Food', status: 'active', expenseCount: 2 },
+  { id: 4, name: 'Health', status: 'active', expenseCount: 0 },
 ];
 
 const saved: Expense = { id: 40, date: '2026-09-15', amountMinor: 30_000, categoryId: 1, note: 'Pho' };
@@ -77,13 +77,18 @@ describe('App', () => {
   });
 
   describe('header navigation (SPD-2)', () => {
-    // SPD-4 AC-1 adds the "Budgets" link after "Summary".
-    it('AC-1: shows the brand followed by the Expenses, Summary and Budgets links, with the current one active', async () => {
+    // SPD-4 AC-1 adds the "Budgets" link after "Summary"; SPD-6 AC-1 adds "Categories" last.
+    it('AC-1: shows the brand followed by the Expenses, Summary, Budgets and Categories links, with the current one active', async () => {
       render(<App />);
 
       const header = screen.getByRole('banner');
-      expect(header).toHaveTextContent(/^SpendlyExpensesSummaryBudgets$/);
-      expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(['Expenses', 'Summary', 'Budgets']);
+      expect(header).toHaveTextContent(/^SpendlyExpensesSummaryBudgetsCategories$/);
+      expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual([
+        'Expenses',
+        'Summary',
+        'Budgets',
+        'Categories',
+      ]);
       expect(screen.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
       expect(screen.getByRole('link', { name: 'Summary' })).not.toHaveAttribute('aria-current');
       expect(await screen.findByText('No expenses for this month.')).toBeInTheDocument();
@@ -118,13 +123,13 @@ describe('App', () => {
   });
 
   describe('budgets (SPD-4)', () => {
-    it('AC-1: the header shows "Spendly" and the links Expenses, Summary, Budgets with the current one active', async () => {
+    it('AC-1: the header shows "Spendly" and the links Expenses, Summary, Budgets, Categories with the current one active', async () => {
       await openList();
 
       const banner = screen.getByRole('banner');
       expect(banner.firstElementChild).toHaveTextContent('Spendly');
       const links = screen.getAllByRole('link');
-      expect(links.map((link) => link.textContent)).toEqual(['Expenses', 'Summary', 'Budgets']);
+      expect(links.map((link) => link.textContent)).toEqual(['Expenses', 'Summary', 'Budgets', 'Categories']);
       expect(screen.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
       expect(screen.getByRole('link', { name: 'Budgets' })).not.toHaveAttribute('aria-current');
     });
@@ -144,6 +149,38 @@ describe('App', () => {
       navigateTo(screen.getByRole('link', { name: 'Expenses' }).getAttribute('href') ?? '');
 
       expect(await screen.findByRole('heading', { name: 'Expenses' })).toBeInTheDocument();
+    });
+  });
+
+  describe('categories (SPD-6)', () => {
+    it('AC-1: the header shows "Spendly" and the links Expenses, Summary, Budgets, Categories', async () => {
+      await openList();
+
+      expect(screen.getByRole('banner').firstElementChild).toHaveTextContent('Spendly');
+      expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual([
+        'Expenses',
+        'Summary',
+        'Budgets',
+        'Categories',
+      ]);
+      expect(screen.getByRole('link', { name: 'Categories' })).not.toHaveAttribute('aria-current');
+    });
+
+    it.each([
+      ['#/', 'Expenses'],
+      ['#/summary', 'Summary'],
+      ['#/budgets', 'Budgets'],
+    ])('AC-1, AC-2: "Categories" opens the Categories screen from %s and marks its link active', async (start, from) => {
+      window.location.hash = start;
+      render(<App />);
+      expect(screen.getByRole('link', { name: from })).toHaveAttribute('aria-current', 'page');
+
+      navigateTo(screen.getByRole('link', { name: 'Categories' }).getAttribute('href') ?? '');
+
+      expect(await screen.findByRole('heading', { name: 'Categories' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Categories' })).toHaveAttribute('aria-current', 'page');
+      expect(screen.getByRole('link', { name: from })).not.toHaveAttribute('aria-current');
+      expect(await screen.findByRole('cell', { name: 'Health' })).toBeInTheDocument();
     });
   });
 

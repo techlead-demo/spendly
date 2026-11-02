@@ -12,7 +12,12 @@ vi.mock('../api/client', async (importActual) => ({
 }));
 
 const NAMES = ['Food', 'Transport', 'Housing', 'Health', 'Entertainment', 'Other'];
-const CATEGORIES: Category[] = NAMES.map((name, index) => ({ id: index + 1, name }));
+const CATEGORIES: Category[] = NAMES.map((name, index) => ({
+  id: index + 1,
+  name,
+  status: 'active',
+  expenseCount: 0,
+}));
 const FOOD = 1;
 const TRANSPORT = 2;
 const ENTERTAINMENT = 5;
@@ -437,5 +442,24 @@ describe('BudgetsPage', () => {
     type('Food', '710000');
 
     expect(screen.queryByText('Budgets saved.')).not.toBeInTheDocument();
+  });
+
+  it('SPD-6 AC-24, AC-25: lists the active categories the API returns, in category order, with their budgets', async () => {
+    vi.mocked(fetchCategories).mockResolvedValue([
+      ...CATEGORIES,
+      { id: 7, name: 'Coffee', status: 'active', expenseCount: 0 },
+      { id: 8, name: 'Gym', status: 'retired', expenseCount: 6 },
+    ]);
+    // GET /budgets returns active categories only (BR-24).
+    vi.mocked(fetchBudgets).mockResolvedValue({
+      month: '2026-11',
+      items: [1, 2, 3, 4, 5, 6, 7].map((categoryId) => ({ categoryId, amountMinor: categoryId === 1 ? 500_000 : null })),
+    });
+    await openPage();
+
+    const rows = screen.getAllByRole('row').slice(1);
+    expect(rows.map((row) => within(row).getAllByRole('cell')[0]?.textContent)).toEqual([...NAMES, 'Coffee']);
+    expect(field('Food')).toHaveValue('500000');
+    expect(field('Coffee')).toHaveValue('');
   });
 });

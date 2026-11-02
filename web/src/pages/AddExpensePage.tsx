@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, UNKNOWN_ERROR_CODE, createExpense, fetchCategories } from '../api/client';
 import type { Category, Expense } from '../api/types';
 import { ExpenseFormFields, type ExpenseFieldRefs } from '../components/ExpenseFormFields';
+import { selectableCategories } from '../lib/categories';
 import { today } from '../lib/dates';
 import {
   FIX_FIELDS_MESSAGE,
@@ -43,7 +44,8 @@ export function AddExpensePage({ onSaved, onCancel }: AddExpensePageProps) {
     let cancelled = false;
     fetchCategories()
       .then((items) => {
-        if (!cancelled) setCategories(items);
+        // BR-24: retired categories are not offered for a new expense.
+        if (!cancelled) setCategories(selectableCategories(items));
       })
       .catch(() => {
         if (!cancelled) setBanner(CATEGORIES_FAILED_MESSAGE);

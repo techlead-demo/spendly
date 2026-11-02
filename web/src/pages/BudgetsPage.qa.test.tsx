@@ -14,7 +14,12 @@ vi.mock('../api/client', async (importActual) => ({
 }));
 
 const NAMES = ['Food', 'Transport', 'Housing', 'Health', 'Entertainment', 'Other'];
-const CATEGORIES: Category[] = NAMES.map((name, index) => ({ id: index + 1, name }));
+const CATEGORIES: Category[] = NAMES.map((name, index) => ({
+  id: index + 1,
+  name,
+  status: 'active',
+  expenseCount: 0,
+}));
 const FOOD = 1;
 const TRANSPORT = 2;
 const ENTERTAINMENT = 5;

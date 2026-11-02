@@ -16,7 +16,17 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', testIgnore: /categories\.spec\.ts$/, use: { ...devices['Desktop Chrome'] } },
+    // Adding, renaming and retiring categories changes the shared category list that the other tests rely on
+    // (the six default categories), so these tests run after all others.
+    {
+      name: 'categories',
+      testMatch: /categories\.spec\.ts$/,
+      dependencies: ['chromium'],
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
   webServer: [
     {
       // API on a fresh in-memory database with the sample data.
