@@ -3,9 +3,9 @@ issue: SPD-3
 title: Edit and delete an expense
 type: story
 status: draft            # draft | approved | implemented | cancelled
-version: 2
+version: 3
 design: [project-context/design/screens/expense-list.html, project-context/design/screens/expense-form-edit.html, project-context/design/screens/expense-form-errors.html, specs/SPD-3/wireframes/edit-expense-delete-confirm.html, specs/SPD-3/wireframes/expense-list-undo-toast.html, specs/SPD-3/wireframes/edit-expense-not-found.html]
-business_rules: [BR-1, BR-2, BR-3, BR-4, BR-5, BR-6, BR-7, BR-9, BR-10, BR-11, BR-12, BR-13, BR-19, BR-20]
+business_rules: [BR-1, BR-2, BR-3, BR-4, BR-5, BR-6, BR-7, BR-9, BR-10, BR-11, BR-12, BR-13, BR-20, BR-21]
 ---
 
 # SPD-3 Edit and delete an expense
@@ -49,7 +49,7 @@ Edit: main flow
 - **AC-4** Given the Edit expense form for E, when the user changes Amount to `250000` and Note to `Groceries` and clicks Save, then E is stored with amount 250000 and note "Groceries" (id, date and category unchanged). The expense list shows November 2026 with "All categories", E's row reads `02/11/2026 · Food · Groceries · 250.000 ₫`, and the month total is 30.000 ₫ lower than before.
 - **AC-5** Given the Edit expense form for E, when the user changes Category to Transport and saves, then E is listed as Transport, and the monthly summary for November 2026 shows its 280.000 ₫ under Transport instead of Food (count and total of both rows updated, BR-13).
 - **AC-6** Given the Edit expense form for E, when the user changes Date to `2026-10-28` and saves, then the list shows `2026-10` with "All categories" and contains E dated `28/10/2026`; November 2026 no longer contains E and its month total is 280.000 ₫ lower; October's month total is 280.000 ₫ higher (BR-3).
-- **AC-7** Given two expenses on `2026-11-02`, E (id 7, recorded first) and F (id 9, recorded later), so the list shows F above E, when the user edits E's amount and saves, then F is still listed above E (BR-19: editing keeps recording order).
+- **AC-7** Given two expenses on `2026-11-02`, E (id 7, recorded first) and F (id 9, recorded later), so the list shows F above E, when the user edits E's amount and saves, then F is still listed above E (BR-20: editing keeps recording order).
 - **AC-8** Given the user changes the Note of E to `  Market  `, when they save, then the stored note is "Market"; given they clear the Note or enter only spaces, then the stored note is empty (`null`) and the row shows no note (BR-11).
 - **AC-9** Given the Edit expense form, when the user saves without changing anything, then the request succeeds, E is unchanged and the list is shown as in AC-4.
 - **AC-10** Given a Save request is in progress, when the user clicks Save again, then only one update is sent. Save and Delete are disabled until the request finishes.
@@ -68,7 +68,7 @@ Edit: validation
 Delete
 - **AC-18** Given the Edit expense form for E, when the user clicks "Delete", then nothing is deleted yet; a modal dialog opens over the dimmed form with the title "Delete this expense?", the text "02/11/2026 · Food · 280.000 ₫ will be removed. You can undo this for 5 seconds." and the buttons "Delete expense" (danger) and "Keep". Focus moves to "Keep" and stays inside the dialog (Tab cycles between its two buttons); the form behind it cannot be used.
 - **AC-19** Given the delete dialog is open, when the user clicks "Keep", presses Escape or clicks the dimmed area outside the dialog, then the dialog closes, nothing is deleted, the form shows the field values as they were and focus returns to "Delete".
-- **AC-20** Given the list showed November 2026 filtered to Food and the user opened E with "Edit", when they click "Delete" and then "Delete expense", then E is deleted (BR-20): the list is shown on November 2026 filtered to Food, E's row is gone and the month total is 280.000 ₫ lower; the monthly summary for November 2026 counts one Food expense fewer and 280.000 ₫ less. A toast "Expense deleted." with the button "Undo" is shown at the bottom of the list.
+- **AC-20** Given the list showed November 2026 filtered to Food and the user opened E with "Edit", when they click "Delete" and then "Delete expense", then E is deleted (BR-21): the list is shown on November 2026 filtered to Food, E's row is gone and the month total is 280.000 ₫ lower; the monthly summary for November 2026 counts one Food expense fewer and 280.000 ₫ less. A toast "Expense deleted." with the button "Undo" is shown at the bottom of the list.
 - **AC-21** Given E is the only expense of November 2026, when the user deletes it, then the list shows "No expenses for this month.", a month total of 0 ₫ and the toast "Expense deleted." with "Undo".
 - **AC-22** Given the user edited some fields before clicking "Delete", when they confirm with "Delete expense", then the expense is deleted and the edits are not saved; an Undo restores the expense with its values from before the edits.
 - **AC-23** Given a delete request is in progress, when the user clicks "Delete expense" again, then only one delete request is sent; both dialog buttons are disabled and Escape and outside clicks do nothing until it finishes.
@@ -91,7 +91,7 @@ API
 Undo (UI)
 - **AC-35** Given the toast "Expense deleted." is shown after deleting E from November 2026 filtered to Food, when the user clicks "Undo" within 5 seconds, then E is restored with id 7, date `2026-11-02`, amount 280000, category Food and note "Groceries at Co.opmart"; the toast closes, the list stays on November 2026 filtered to Food, E's row is back in its previous position and the month total is 280.000 ₫ higher again; the monthly summary for November 2026 counts it again.
 - **AC-36** Given the toast "Expense deleted." is shown, when 5 seconds pass without a click on "Undo", then the toast closes and the deletion stays; the list and totals do not change.
-- **AC-37** Given two expenses on `2026-11-02`, E (id 7, recorded first) and F (id 9, recorded later), when the user deletes E and clicks "Undo", then the list shows F above E again (BR-7, BR-20: a restored expense keeps its place in recording order).
+- **AC-37** Given two expenses on `2026-11-02`, E (id 7, recorded first) and F (id 9, recorded later), when the user deletes E and clicks "Undo", then the list shows F above E again (BR-7, BR-21: a restored expense keeps its place in recording order).
 - **AC-38** Given the toast is shown, when the user leaves the expense list (e.g. clicks Summary, "Add expense" or "Edit" on another row) or reloads the page, then the toast closes and the deletion stays; the monthly summary does not count E.
 - **AC-39** Given the user clicked "Undo", while the restore request is in progress, then "Undo" is disabled, only one restore request is sent and the toast stays open until the request finishes, even past 5 seconds.
 - **AC-40** Given the API cannot be reached or answers with an error when the user clicks "Undo", then the deletion stays, and the toast text changes to "Could not restore the expense." without the "Undo" button and closes 5 seconds later.
@@ -105,8 +105,8 @@ Restore (API)
 
 ## Business rules
 - Existing: BR-1 (positive whole VND), BR-2 (one existing category), BR-3 (date; belongs to its month), BR-4 and BR-11 (optional note, max 200, trimmed), BR-5 (fixed categories), BR-6 (one month), BR-7 (order), BR-9 (VND format), BR-12 (any valid date, past or future, is accepted; the "defaults to today" part applies to new expenses only), BR-13 (summary totals follow the stored expenses).
-- New **BR-19**: Any expense can be edited, whatever its month. Editing can change the date, amount, category and note under the same rules as recording (BR-1–BR-4, BR-11, BR-12). An edited expense keeps its identity and its place in recording order (BR-7).
-- New **BR-20** (changed in version 2): An expense is deleted only after the user confirms in a dialog. A deleted expense immediately stops counting in every list, total and summary. For 5 seconds after the deletion the user can undo it; undoing restores the same expense (id, date, amount, category, note and place in recording order). After that the user cannot restore it.
+- New **BR-20** (numbered BR-19 before version 3): Any expense can be edited, whatever its month. Editing can change the date, amount, category and note under the same rules as recording (BR-1–BR-4, BR-11, BR-12). An edited expense keeps its identity and its place in recording order (BR-7).
+- New **BR-21** (numbered BR-20 before version 3; changed in version 2): An expense is deleted only after the user confirms in a dialog. A deleted expense immediately stops counting in every list, total and summary. For 5 seconds after the deletion the user can undo it; undoing restores the same expense (id, date, amount, category, note and place in recording order). After that the user cannot restore it.
 
 ## UI
 **Expense list**: `project-context/design/screens/expense-list.html`
@@ -143,7 +143,7 @@ Restore (API)
 - Messages: "This expense no longer exists." (404, AC-24, AC-25); "Could not load the expense. Try again." (other load failures, AC-28).
 
 ## Data and API impact
-- Data: updates change the existing expense (same id). A delete must keep the expense's data and mark it as deleted, so that it can be restored with the same id, values and recording order (BR-20); this needs a schema change in `expenses`. The note is stored trimmed, or `NULL` when empty.
+- Data: updates change the existing expense (same id). A delete must keep the expense's data and mark it as deleted, so that it can be restored with the same id, values and recording order (BR-21); this needs a schema change in `expenses`. The note is stored trimmed, or `NULL` when empty.
 - API (all under `/api/v1/expenses/:id`, id a positive integer, 400 `VALIDATION_ERROR` otherwise, 404 `NOT_FOUND` for an unknown or deleted id unless stated):
   - `GET` returns one expense `{ id, date, amountMinor, categoryId, note }`.
   - `PUT` replaces date, amount, category and note; same body and validation as `POST /api/v1/expenses`; returns 200 with the updated expense.
@@ -169,7 +169,8 @@ Restore (API)
 ## Questions and answers
 | # | Question | Answer | Source |
 |---|---|---|---|
-| — | Review comment (not a question): "Please use a modal dialog for the delete confirmation and add an 'Undo' toast for 5 seconds instead of permanent deletion" | Applied in version 2: modal dialog (AC-18, AC-19, AC-23), Undo toast for 5 seconds (AC-20, AC-21, AC-35–AC-41), restore API (AC-42–AC-45), BR-20 changed | PR #9 comment by longnt-techleadjsc-vn, 2026-11-02 |
+| — | Review comment (not a question): "Please use a modal dialog for the delete confirmation and add an 'Undo' toast for 5 seconds instead of permanent deletion" | Applied in version 2: modal dialog (AC-18, AC-19, AC-23), Undo toast for 5 seconds (AC-20, AC-21, AC-35–AC-41), restore API (AC-42–AC-45), BR-20 changed (now BR-21) | PR #9 comment by longnt-techleadjsc-vn, 2026-11-02 |
+| — | Jira comment (not a question): "The PR has some conflicts. Please resolve them" | Applied in version 3: the delete rules are renumbered BR-20 (edit) and BR-21 (delete and undo) because SPD-5 took BR-19 on `develop` | Jira comment by admin, 2026-11-02 |
 
 ## Changelog
 | Version | Change |
@@ -177,3 +178,5 @@ Restore (API)
 | 1 | Initial spec |
 | 2 | Review (PR #9, longnt-techleadjsc-vn): delete confirmation moved from an inline banner to a modal dialog: AC-18, AC-19, AC-23, AC-25, AC-27 updated, wireframe `edit-expense-delete-confirm.html` redrawn, A-2 changed. |
 | 2 | Review (PR #9, longnt-techleadjsc-vn): deletion is no longer permanent; a 5-second "Undo" toast restores the expense: AC-20–AC-22 updated, AC-35–AC-45 added, AC-34 extended to the restore endpoint, new wireframe `expense-list-undo-toast.html`, new `POST /api/v1/expenses/:id/restore`, deleted expenses kept and marked deleted, BR-20 changed in `rules.md`, glossary adds "Undo toast", A-4 and A-8 changed, A-10–A-12 added, scope updated. |
+| 3 | Jira comment (admin): resolve the PR conflict in `rules.md`. SPD-5 (merged to `develop`) took BR-19 for "over budget", so this spec's rules move to the next free numbers: edit rule BR-19 → BR-20, delete and undo rule BR-20 → BR-21. Front matter, AC-7, AC-20, AC-37, Business rules and Data and API impact updated; `rules.md` now also holds SPD-5's BR-19 with the same text as `develop`. No behaviour changes. |
+| 3 | PR #9 comment (longnt-techleadjsc-vn, modal dialog and 5-second Undo toast): no further change; it was already applied in version 2 (see the version 2 rows). |
