@@ -979,3 +979,65 @@ test.describe('SPD-3 QA: undo toast', () => {
     expect((await getExpense(request, id)).status).toBe(200);
   });
 });
+
+test.describe('SPD-3 QA: regression', () => {
+  test('TC-55: the over-budget banner follows a delete, an Undo and an edit of the expense', async ({
+    page,
+    request,
+  }) => {
+    // A far-future month, so that sample data and other tests do not change the Food total.
+    const month = `${4000 + Math.floor(Math.random() * 5000)}-05`;
+    const budget = await request.put('/api/v1/budgets', {
+      data: { month, items: [{ categoryId: FOOD, amountMinor: 100_000 }] },
+    });
+    expect(budget.ok()).toBe(true);
+    const note = uniqueNote('Over budget');
+    const id = await createExpense(request, { date: `${month}-10`, amountMinor: 150_000, categoryId: FOOD, note });
+    const banner = page.getByRole('alert').filter({ hasText: 'Food' });
+    await showList(page, month);
+    await expect(banner).toBeVisible();
+
+    await openEdit(page, note);
+    await confirmDelete(page);
+    await expect(page.getByRole('status')).toContainText('Expense deleted.');
+    await expect(banner).toHaveCount(0);
+
+    await page.getByRole('status').getByRole('button', { name: 'Undo' }).click();
+    await expect(rowWith(page, note)).toBeVisible();
+    await expect(banner).toBeVisible();
+
+    await openEdit(page, note);
+    await page.getByLabel('Amount').fill('90000');
+    await page.getByRole('button', { name: 'Save' }).click();
+    await expect(rowWith(page, note)).toContainText('90.000');
+    await expect(banner).toHaveCount(0);
+    expect((await getExpense(request, id)).body?.amountMinor).toBe(90_000);
+  });
+
+  test('TC-56: Cancel is disabled while a Save is in progress', async ({ page, request }) => {
+    const note = uniqueNote('Cancel while saving');
+    const id = await createExpense(request, E(note));
+    await page.route(`**/api/v1/expenses/${id}`, async (route) => {
+      if (route.request().method() === 'PUT') await new Promise((resolve) => setTimeout(resolve, 1500));
+      await route.continue();
+    });
+    await openEditById(page, id);
+    await page.getByLabel('Amount').fill('260000');
+
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    await expect(page.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
+    await expect(rowWith(page, note)).toContainText('260.000');
+  });
+
+  test('TC-57 (AC-24): an Edit link with an id beyond the safe integer range shows the not-found state', async ({
+    page,
+  }) => {
+    await page.goto('/#/expenses/99999999999999999999/edit');
+
+    await expect(page.getByRole('heading', { name: 'Edit expense' })).toBeVisible();
+    await expect(page.getByRole('alert')).toHaveText(NOT_FOUND);
+    await expect(page.getByRole('link', { name: 'Back to expenses' })).toBeVisible();
+  });
+});
