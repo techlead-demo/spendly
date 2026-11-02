@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { validationError } from '../errors.js';
 import { isDate, isMonth } from '../lib/dates.js';
 import type { ExpenseFilter } from '../repositories/expenseRepository.js';
-import type { ExpenseService } from '../services/expenseService.js';
+import { NOTE_MAX_LENGTH, type ExpenseService } from '../services/expenseService.js';
 import type { NewExpense } from '../types.js';
 
 function parseListQuery(query: Record<string, unknown>): ExpenseFilter {
@@ -40,7 +40,12 @@ function parseNewExpense(body: unknown): NewExpense {
   if (note !== undefined && note !== null && typeof note !== 'string') {
     throw validationError('note must be a string or null');
   }
-  return { date, amountMinor, categoryId, note: note ?? null };
+  // BR-11: the note is trimmed, at most NOTE_MAX_LENGTH characters, and a blank note is no note.
+  const trimmed = note?.trim() ?? '';
+  if (trimmed.length > NOTE_MAX_LENGTH) {
+    throw validationError(`note must be at most ${NOTE_MAX_LENGTH} characters`);
+  }
+  return { date, amountMinor, categoryId, note: trimmed === '' ? null : trimmed };
 }
 
 export function expensesRouter(expenses: ExpenseService): Router {

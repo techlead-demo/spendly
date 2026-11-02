@@ -13,7 +13,10 @@ export interface ExpenseList {
 
 export interface ExpenseService {
   listExpenses(filter: ExpenseFilter): ExpenseList;
-  /** Records an expense (BR-2, BR-11). Throws a validation error for an unknown category or a too long note. */
+  /**
+   * Records an expense whose fields the route has validated and normalised (BR-11: note trimmed, blank → null).
+   * Throws a validation error for an unknown category (BR-2).
+   */
   createExpense(expense: NewExpense): Expense;
 }
 
@@ -28,15 +31,11 @@ export function createExpenseService(
         monthTotalMinor: expenses.sumByMonth(filter.month),
       };
     },
-    createExpense({ date, amountMinor, categoryId, note }) {
-      const trimmed = note?.trim() ?? '';
-      if (trimmed.length > NOTE_MAX_LENGTH) {
-        throw validationError(`note must be at most ${NOTE_MAX_LENGTH} characters`);
+    createExpense(expense) {
+      if (!categories.exists(expense.categoryId)) {
+        throw validationError(`categoryId ${expense.categoryId} does not exist`);
       }
-      if (!categories.exists(categoryId)) {
-        throw validationError(`categoryId ${categoryId} does not exist`);
-      }
-      return expenses.create({ date, amountMinor, categoryId, note: trimmed === '' ? null : trimmed });
+      return expenses.create(expense);
     },
   };
 }

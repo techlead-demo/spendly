@@ -1,7 +1,7 @@
 ---
 issue: SPD-1
 spec_version: 1
-revision: 0
+revision: 2
 ---
 
 # Implementation plan — SPD-1
@@ -9,8 +9,8 @@ revision: 0
 ## Approach
 **API.** New `POST /api/v1/expenses`. The route checks the request shape (types and formats: `date` is a real
 calendar date `YYYY-MM-DD`, `amountMinor` a safe positive integer, `categoryId` a positive integer, `note` a
-string, `null` or absent). The expense service applies the business rules: BR-11 (trim the note, blank → `null`,
-at most 200 characters) and BR-2 (the category must exist), both as 400 `VALIDATION_ERROR`, then the repository
+string, `null` or absent) and BR-11 (trim the note, blank → `null`, at most 200 characters; moved from the service
+in revision 2). The expense service applies BR-2 (the category must exist), both as 400 `VALIDATION_ERROR`, then the repository
 inserts the row and returns it. Response 201 with the created expense.
 
 **Web.** `App` keeps a small view state (`list` | `add`) and the list filter (month + category), lifted out of
@@ -82,3 +82,11 @@ None (no schema change). `data-model.md` notes that the note is stored trimmed a
 - The form lives in `AddExpensePage` (state + layout). SPD-3 (edit) may extract a shared form component.
 - A response that is not the standard error body (e.g. the dev proxy failing because the API is down) is treated
   like a network failure (AC-25 message).
+
+## Revision 2
+| Feedback item | Resolution |
+|---|---|
+| [major] Malformed JSON body returns 500 INTERNAL_ERROR | Fixed: `errorHandler` maps `express.json()` errors (4xx with a `type`) to 400 `VALIDATION_ERROR` ("request body must be valid JSON" for `entity.parse.failed`). New Supertest case sends `{"date":`. `api.md` error table updated. |
+| [minor] Note length (BR-11) validated in the service, not at the route | Fixed: trimming, the 200-character check and blank → `null` moved to `parseNewExpense` in the route; the service keeps only the category-exists check (BR-2, needs the repository). `data-model.md` updated. Existing AC-8/AC-23 API tests unchanged and passing. |
+| [nit] `isDate` rejects years 0000–0099 | Declined: the human reviewer asked to ignore the nits; no practical impact for expenses. |
+| [nit] Whitespace change in `formatDate` doc comment | Declined: the human reviewer asked to ignore the nits. |
