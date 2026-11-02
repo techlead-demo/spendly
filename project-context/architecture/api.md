@@ -65,3 +65,29 @@ Errors: `GET /api/v1/expenses?month=2026-13` → 400
 ```json
 { "error": { "code": "VALIDATION_ERROR", "message": "month is required and must be YYYY-MM" } }
 ```
+
+## POST /api/v1/expenses
+Records one expense (BR-1, BR-2, BR-3, BR-11, BR-12).
+
+Request body:
+| Field | Required | Type | Rules |
+|---|---|---|---|
+| `date` | yes | string | Existing calendar date `YYYY-MM-DD` (`2026-02-30`, `2026-11-2` are rejected); past and future dates are accepted |
+| `amountMinor` | yes | integer (JSON number) | `1` to `9007199254740991`; strings and decimals are rejected |
+| `categoryId` | yes | integer (JSON number) | Id of an existing category |
+| `note` | no | `string \| null` | Trimmed; at most 200 characters after trimming; empty after trimming is stored as `null` |
+
+Request:
+```json
+{ "date": "2026-11-02", "amountMinor": 85000, "categoryId": 1, "note": "  Lunch " }
+```
+
+Response 201: the created expense.
+```json
+{ "id": 26, "date": "2026-11-02", "amountMinor": 85000, "categoryId": 1, "note": "Lunch" }
+```
+
+Errors: 400 `VALIDATION_ERROR` for any rule above, nothing is stored; the message names the field, e.g.
+```json
+{ "error": { "code": "VALIDATION_ERROR", "message": "categoryId 99 does not exist" } }
+```

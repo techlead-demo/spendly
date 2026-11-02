@@ -19,7 +19,7 @@ Fixed rows (inserted by `seedCategories` on every startup if missing):
 | date | TEXT | not null, `YYYY-MM-DD` (CHECK on format), local date | `date` |
 | amount_minor | INTEGER | not null, `> 0`; VND minor units (1 = 1 đồng) | `amountMinor` |
 | category_id | INTEGER | not null, references `categories(id)` | `categoryId` |
-| note | TEXT | nullable; `NULL` when there is no note | `note` (`string \| null`) |
+| note | TEXT | nullable; `NULL` when there is no note; stored trimmed, at most 200 characters (BR-11, enforced by the expense service) | `note` (`string \| null`) |
 
 Index: `idx_expenses_date` on `date`.
 
