@@ -5,6 +5,7 @@
 .header {
   display: flex;
   align-items: center;
+  gap: var(--space-6);
   height: var(--header-height);
   padding: 0 var(--space-6);
   background: var(--color-surface);
@@ -15,6 +16,23 @@
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.navLink {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  padding: var(--space-2) 0;
+}
+
+.active {
+  color: var(--color-text);
+  font-weight: var(--font-weight-medium);
+  border-bottom: 2px solid var(--color-primary);
 }
 
 .main {

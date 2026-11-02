@@ -5,6 +5,7 @@ import { createCategoryRepository } from './repositories/categoryRepository.js';
 import { createExpenseRepository } from './repositories/expenseRepository.js';
 import { categoriesRouter } from './routes/categories.js';
 import { expensesRouter } from './routes/expenses.js';
+import { summaryRouter } from './routes/summary.js';
 import { createExpenseService } from './services/expenseService.js';
 
 /** Builds the Express app on top of an open database. Tests call this with an in-memory database. */
@@ -18,6 +19,7 @@ export function createApp(db: DatabaseSync): express.Express {
   const api = express.Router();
   api.use('/categories', categoriesRouter(categories));
   api.use('/expenses', expensesRouter(expenses));
+  api.use('/summary', summaryRouter(expenses));
   app.use('/api/v1', api);
 
   app.use(notFoundHandler);

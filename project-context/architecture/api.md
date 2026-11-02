@@ -91,3 +91,39 @@ Errors: 400 `VALIDATION_ERROR` for any rule above, nothing is stored; the messag
 ```json
 { "error": { "code": "VALIDATION_ERROR", "message": "categoryId 99 does not exist" } }
 ```
+
+## GET /api/v1/summary
+Monthly summary (BR-13): count and total per category for one month. Only categories with at least one expense in the month are listed, largest total first; equal totals follow the fixed category order (category `id`).
+
+Query parameters:
+| Name | Required | Format | Notes |
+|---|---|---|---|
+| `month` | yes | `YYYY-MM` | 400 `VALIDATION_ERROR` if missing or malformed (same rule as `GET /api/v1/expenses`) |
+
+Request: `GET /api/v1/summary?month=2026-11`
+
+Response 200:
+```json
+{
+  "month": "2026-11",
+  "items": [
+    { "categoryId": 3, "categoryName": "Housing", "count": 1, "totalMinor": 6500000 },
+    { "categoryId": 1, "categoryName": "Food", "count": 2, "totalMinor": 205000 },
+    { "categoryId": 2, "categoryName": "Transport", "count": 1, "totalMinor": 50000 },
+    { "categoryId": 4, "categoryName": "Health", "count": 1, "totalMinor": 50000 }
+  ],
+  "monthCount": 5,
+  "monthTotalMinor": 6805000
+}
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `month` | string | The requested month, `YYYY-MM` |
+| `items` | CategorySummary[] | `{ categoryId, categoryName, count, totalMinor }`; empty for a month without expenses |
+| `monthCount` | integer | Number of expenses in the month; `0` when there are none |
+| `monthTotalMinor` | integer | Sum of all `totalMinor`, VND minor units; equals `monthTotalMinor` of `GET /api/v1/expenses` for the month |
+
+Shares of the month total (BR-15) are not returned; the web app derives them from `totalMinor` and `monthTotalMinor` (`web/src/lib/share.ts`).
+
+Errors: `GET /api/v1/summary?month=2026-1` → 400 `VALIDATION_ERROR` with the message above.

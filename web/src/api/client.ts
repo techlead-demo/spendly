@@ -1,4 +1,12 @@
-import type { ApiErrorBody, Category, Expense, ExpenseListResponse, ListResponse, NewExpense } from './types';
+import type {
+  ApiErrorBody,
+  Category,
+  Expense,
+  ExpenseListResponse,
+  ListResponse,
+  MonthlySummary,
+  NewExpense,
+} from './types';
 
 const BASE_PATH = '/api/v1';
 
@@ -47,4 +55,8 @@ export function createExpense(expense: NewExpense): Promise<Expense> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(expense),
   });
+}
+
+export function fetchSummary(month: string): Promise<MonthlySummary> {
+  return request<MonthlySummary>(`/summary?${new URLSearchParams({ month })}`);
 }
