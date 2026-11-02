@@ -9,6 +9,7 @@
 - **Month**: a calendar month, `YYYY-MM`. An expense belongs to the month of its date.
 - **Current month**: the month of today's local date.
 - **Expense list**: the screen listing a month's expenses.
+- **Add expense form**: the screen where the user records a new expense (date, amount, category, optional note).
 - **Category filter**: the expense list option that shows only one category ("All categories" shows every category).
 - **Month total**: the total amount spent in the selected month, shown under the expense list.
 - **Sample data**: the expenses a new database is created with, so the app is not empty on first use.
