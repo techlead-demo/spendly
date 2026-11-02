@@ -32,8 +32,8 @@
   border-top: 1px solid var(--color-border);
 }
 
-.num {
-  text-align: right !important;
+.table .num {
+  text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
