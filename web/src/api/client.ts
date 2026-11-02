@@ -1,4 +1,4 @@
-import type { ApiErrorBody, Category, ExpenseListResponse, ListResponse } from './types';
+import type { ApiErrorBody, Category, ExpenseListResponse, ListResponse, MonthlySummary } from './types';
 
 const BASE_PATH = '/api/v1';
 
@@ -32,4 +32,8 @@ export function fetchExpenses(month: string, categoryId?: number): Promise<Expen
     params.set('categoryId', String(categoryId));
   }
   return getJson<ExpenseListResponse>(`/expenses?${params}`);
+}
+
+export function fetchSummary(month: string): Promise<MonthlySummary> {
+  return getJson<MonthlySummary>(`/summary?${new URLSearchParams({ month })}`);
 }

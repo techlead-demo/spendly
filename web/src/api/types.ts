@@ -23,6 +23,22 @@ export interface ExpenseListResponse extends ListResponse<Expense> {
   monthTotalMinor: number;
 }
 
+export interface CategorySummary {
+  categoryId: number;
+  categoryName: string;
+  count: number;
+  /** Integer total in VND minor units. */
+  totalMinor: number;
+}
+
+export interface MonthlySummary {
+  /** "YYYY-MM" */
+  month: string;
+  items: CategorySummary[];
+  monthCount: number;
+  monthTotalMinor: number;
+}
+
 export interface ApiErrorBody {
   error: { code: string; message: string };
 }
