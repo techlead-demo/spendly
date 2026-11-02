@@ -25,11 +25,11 @@ server/src/
   lib/                pure helpers (dates)
 server/test/          Vitest + Supertest tests, helpers.ts
 web/src/
-  main.tsx, App.tsx   entry and app shell (header + page)
-  pages/              one component per screen (ExpenseListPage)
+  main.tsx, App.tsx   entry and app shell (header + page); App holds the current view (list | add) and the list filter
+  pages/              one component per screen (ExpenseListPage, AddExpensePage)
   components/         reusable presentational components (ExpenseTable)
   api/                client.ts (fetch wrappers, ApiError) and types.ts (API shapes)
-  lib/                pure helpers (money, dates) with co-located tests
+  lib/                pure helpers (money, dates, expenseForm validation) with co-located tests
   styles/global.css   imports project-context/design/tokens.css, base element styles
 ```
 
@@ -46,4 +46,4 @@ web/src/
 - There is no migration tool. Schema changes go into `db/schema.ts`; an existing local DB is rebuilt with `npm run db:reset` (see runbook).
 
 ## Not present yet
-No router (one page), no state library, no auth, no build/deploy pipeline beyond CI.
+No router (`App` switches between the list and the Add expense form with a view state), no state library, no auth, no build/deploy pipeline beyond CI.
