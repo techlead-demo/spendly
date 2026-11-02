@@ -37,6 +37,11 @@
     .amount .suffix { position: absolute; right: var(--space-3); top: 50%; transform: translateY(-50%); color: var(--color-text-muted); }
     .actions { display: flex; gap: var(--space-3); align-items: center; }
     .spacer { flex: 1; }
+    .backdrop { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: var(--space-6); background: color-mix(in srgb, var(--color-text) 45%, transparent); }
+    .dialog { width: 100%; max-width: 420px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-6); display: grid; gap: var(--space-4); }
+    .dialog h2 { margin: 0; font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); }
+    .dialog p { margin: 0; color: var(--color-text-muted); }
+    .dialog .actions { justify-content: flex-end; }
   </style>
 </head>
 <body>
@@ -65,15 +70,25 @@
         <label class="field"><span class="label">Note <span class="muted">(optional)</span></span>
           <textarea class="control" rows="2" maxlength="200">Groceries at Co.opmart</textarea>
         </label>
-        <div class="banner warning" role="alertdialog" aria-label="Confirm delete">
-          <span>Delete this expense? This cannot be undone.</span>
+        <div class="actions">
+          <button class="button primary" type="button">Save</button>
+          <button class="button" type="button">Cancel</button>
           <span class="spacer"></span>
-          <button class="button danger" type="button">Delete expense</button>
-          <button class="button" type="button">Keep</button>
+          <button class="button danger" type="button">Delete</button>
         </div>
       </form>
     </div>
   </main>
-  <p class="mockupNote">Wireframe (SPD-3). Shown here: the confirmation step after "Delete" was clicked on project-context/design/screens/expense-form-edit.html. The confirmation replaces the Save / Cancel / Delete row; focus moves to "Keep". "Keep" returns to the form with the row Save / Cancel / Delete and the field values unchanged. "Delete expense" removes the expense and returns to the expense list. While the delete request runs, both buttons are disabled. If it fails, the form shows the error banner of expense-form-errors.html at the top of the card with "Could not delete the expense. Try again." and the row Save / Cancel / Delete again.</p>
+  <p class="mockupNote">Wireframe (SPD-3). Shown here: the modal dialog after "Delete" was clicked on project-context/design/screens/expense-form-edit.html. The form behind is dimmed and cannot be used; focus starts on "Keep" and Tab cycles between the two dialog buttons. "Keep", Escape or a click on the dimmed area closes the dialog, keeps the field values and returns focus to "Delete". "Delete expense" deletes the expense and returns to the expense list with the undo toast (expense-list-undo-toast.html). While the delete request runs, both buttons are disabled and Escape and outside clicks are ignored. If it fails, the dialog closes and the form shows the error banner of expense-form-errors.html at the top of the card with "Could not delete the expense. Try again."</p>
+  <div class="backdrop">
+    <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" aria-describedby="delete-text">
+      <h2 id="delete-title">Delete this expense?</h2>
+      <p id="delete-text">02/11/2026 · Food · 280.000 ₫ will be removed. You can undo this for 5 seconds.</p>
+      <div class="actions">
+        <button class="button danger" type="button">Delete expense</button>
+        <button class="button" type="button" autofocus>Keep</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

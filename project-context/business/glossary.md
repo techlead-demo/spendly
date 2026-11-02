@@ -11,6 +11,7 @@
 - **Expense list**: the screen listing a month's expenses.
 - **Add expense form**: the screen where the user records a new expense (date, amount, category, optional note).
 - **Edit expense form**: the screen, opened with "Edit" on a row of the expense list, where the user changes or deletes an existing expense (same fields as the add expense form, plus Delete).
+- **Undo toast**: the short message "Expense deleted." with an "Undo" button, shown on the expense list for 5 seconds after an expense is deleted; "Undo" restores the expense.
 - **Category filter**: the expense list option that shows only one category ("All categories" shows every category).
 - **Month total**: the total amount spent in the selected month, shown under the expense list.
 - **Monthly summary**: the screen showing a month's spending grouped by category, with the number of expenses and the total per category and the month total.
