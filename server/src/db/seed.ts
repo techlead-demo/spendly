@@ -1,7 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite';
 import { toLocalDate } from '../lib/dates.js';
 
-/** Fixed reference data: ids never change. */
+/** BR-22: the categories of a new database, in category order. The user can rename and retire them later. */
 export const defaultCategories = [
   { id: 1, name: 'Food' },
   { id: 2, name: 'Transport' },
@@ -47,8 +47,14 @@ const sampleExpenses: SampleExpense[] = [
   { daysAgo: 0, amountMinor: 200_000, categoryId: 5, note: 'Bowling night' },
 ];
 
+/**
+ * Inserts the default categories into a database without categories. A database that has categories is left
+ * alone, so a renamed or retired default category stays as the user left it (SPD-6 AC-26).
+ */
 export function seedCategories(db: DatabaseSync): void {
-  const insert = db.prepare('INSERT OR IGNORE INTO categories (id, name) VALUES (?, ?)');
+  const { count } = db.prepare('SELECT COUNT(*) AS count FROM categories').get() as { count: number };
+  if (count > 0) return;
+  const insert = db.prepare('INSERT INTO categories (id, name) VALUES (?, ?)');
   for (const category of defaultCategories) {
     insert.run(category.id, category.name);
   }

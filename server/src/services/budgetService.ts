@@ -6,11 +6,12 @@ import type { ExpenseRepository } from '../repositories/expenseRepository.js';
 import type { MonthBudgets, MonthOverBudget, OverBudgetCategory } from '../types.js';
 
 export interface BudgetService {
-  /** BR-16: the budget in effect for every category in `month`. */
+  /** BR-16: the budget in effect for every active category (BR-24) in `month`. */
   getBudgets(month: string): MonthBudgets;
   /**
    * Sets or removes the given budgets from `change.month` onward (BR-16, BR-17) and returns the budgets of that month.
-   * Throws a validation error, storing nothing, for a month before the current month (BR-18) or an unknown category.
+   * Throws a validation error, storing nothing, for a month before the current month (BR-18) or an unknown or
+   * retired category (BR-24).
    */
   setBudgets(change: MonthBudgets): MonthBudgets;
   /** BR-19: the categories whose total in `month` is greater than their budget in effect, largest amount over first. */
@@ -24,7 +25,9 @@ export function createBudgetService(
   now: () => Date,
 ): BudgetService {
   function getBudgets(month: string): MonthBudgets {
-    return { month, items: budgets.findInEffect(month) };
+    // BR-24: only active categories get budgets on the Budgets screen; stored budgets of retired ones are kept.
+    const active = new Set(categories.findAll().filter((c) => c.status === 'active').map((c) => c.id));
+    return { month, items: budgets.findInEffect(month).filter((b) => active.has(b.categoryId)) };
   }
 
   return {
@@ -34,9 +37,14 @@ export function createBudgetService(
       if (month < current) {
         throw validationError(`month must be the current month (${current}) or later`);
       }
-      const unknown = items.find((item) => !categories.exists(item.categoryId));
-      if (unknown) {
-        throw validationError(`categoryId ${unknown.categoryId} does not exist`);
+      for (const { categoryId } of items) {
+        const category = categories.findById(categoryId);
+        if (!category) {
+          throw validationError(`categoryId ${categoryId} does not exist`);
+        }
+        if (category.status === 'retired') {
+          throw validationError(`categoryId ${categoryId} is retired`);
+        }
       }
       budgets.saveFrom(month, items);
       return getBudgets(month);
@@ -44,7 +52,7 @@ export function createBudgetService(
     getOverBudget(month) {
       const budgetByCategory = new Map(budgets.findInEffect(month).map((b) => [b.categoryId, b.amountMinor]));
       const items: OverBudgetCategory[] = [];
-      // sumByCategory is in category order and the sort is stable, so equal amounts keep that order (BR-5).
+      // sumByCategory is in category order and the sort is stable, so equal amounts keep that order (BR-22).
       for (const total of expenses.sumByCategory(month)) {
         const budgetMinor = budgetByCategory.get(total.categoryId);
         // No budget in effect means no limit (BR-16); spending equal to the budget is not over (BR-19).

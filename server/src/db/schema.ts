@@ -1,11 +1,15 @@
+import type { DatabaseSync } from 'node:sqlite';
+
 /**
  * Database schema. Statements are idempotent and run on every startup.
  * Columns are snake_case; repositories map rows to camelCase objects.
  */
 export const schema = `
+-- BR-22/BR-24: categories are never deleted, so ids are never reused; retired = 1 hides a category from new choices.
 CREATE TABLE IF NOT EXISTS categories (
-  id   INTEGER PRIMARY KEY,
-  name TEXT    NOT NULL UNIQUE
+  id      INTEGER PRIMARY KEY,
+  name    TEXT    NOT NULL UNIQUE,
+  retired INTEGER NOT NULL DEFAULT 0 CHECK (retired IN (0, 1))
 );
 
 CREATE TABLE IF NOT EXISTS expenses (
@@ -28,3 +32,19 @@ CREATE TABLE IF NOT EXISTS budgets (
   PRIMARY KEY (category_id, from_month)
 );
 `;
+
+/** Indexes that depend on columns added by `migrate`, so they are created after it. */
+const indexes = `
+-- BR-23 backstop: names are unique ignoring (ASCII) letter case; the category service checks full case folding.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_categories_name_nocase ON categories (name COLLATE NOCASE);
+`;
+
+/** Brings a database created by an earlier version up to the current schema. Idempotent. */
+export function migrate(db: DatabaseSync): void {
+  const columns = db.prepare('PRAGMA table_info(categories)').all() as unknown as { name: string }[];
+  if (!columns.some((column) => column.name === 'retired')) {
+    // SPD-6: every existing category stays active.
+    db.exec('ALTER TABLE categories ADD COLUMN retired INTEGER NOT NULL DEFAULT 0 CHECK (retired IN (0, 1))');
+  }
+  db.exec(indexes);
+}

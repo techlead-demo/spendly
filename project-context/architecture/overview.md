@@ -46,7 +46,7 @@ web/src/
 5. Thrown `HttpError`s and unexpected errors are turned into the standard error body by `errorHandler` in `errors.ts`.
 
 ## Startup and data
-- `openDatabase(path)` creates the directory and file if needed, enables foreign keys, runs the idempotent schema (`CREATE TABLE IF NOT EXISTS`) and inserts the fixed categories.
+- `openDatabase(path)` creates the directory and file if needed, enables foreign keys, runs the idempotent schema (`CREATE TABLE IF NOT EXISTS`) and `migrate` (columns added later, e.g. `categories.retired`), and inserts the default categories when the `categories` table is empty.
 - When the database file did not exist before startup (or is `:memory:`), `index.ts` inserts the sample expenses (`seedSampleExpenses`).
 - There is no migration tool. Schema changes go into `db/schema.ts`; an existing local DB is rebuilt with `npm run db:reset` (see runbook).
 
