@@ -92,6 +92,41 @@ Errors: 400 `VALIDATION_ERROR` for any rule above, nothing is stored; the messag
 { "error": { "code": "VALIDATION_ERROR", "message": "categoryId 99 does not exist" } }
 ```
 
+## /api/v1/expenses/:id
+One expense (SPD-3, BR-20, BR-21). For every endpoint below, `id` must be a positive integer, otherwise 400
+`VALIDATION_ERROR` (`id must be a positive integer`). An unknown or deleted expense gives 404 `NOT_FOUND`
+(`expense 9999 does not exist`), except for `restore`. Deleted expenses are excluded from `GET /api/v1/expenses`
+and `GET /api/v1/summary`.
+
+### GET /api/v1/expenses/:id
+Response 200: the expense.
+```json
+{ "id": 7, "date": "2026-11-02", "amountMinor": 280000, "categoryId": 1, "note": "Groceries at Co.opmart" }
+```
+
+### PUT /api/v1/expenses/:id
+Replaces `date`, `amountMinor`, `categoryId` and `note`. Same body and validation as `POST /api/v1/expenses`
+(400 `VALIDATION_ERROR`, nothing changed). The expense keeps its `id` and its place in recording order (BR-20).
+The body is validated before the id is looked up.
+
+Request:
+```json
+{ "date": "2026-10-28", "amountMinor": 250000, "categoryId": 2, "note": " Bus " }
+```
+
+Response 200: the updated expense.
+```json
+{ "id": 7, "date": "2026-10-28", "amountMinor": 250000, "categoryId": 2, "note": "Bus" }
+```
+
+### DELETE /api/v1/expenses/:id
+Marks the expense deleted (BR-21). Response 204 with no body.
+
+### POST /api/v1/expenses/:id/restore
+Undoes a delete: the expense comes back with the same `id`, values and place in recording order. No body.
+Response 200: the expense, also when it was not deleted (idempotent). 404 `NOT_FOUND` only for an id that was
+never recorded. The server sets no time limit; the 5-second Undo window is enforced by the web app (SPD-3 A-10).
+
 ## GET /api/v1/summary
 Monthly summary (BR-13): count and total per category for one month. Only categories with at least one expense in the month are listed, largest total first; equal totals follow the fixed category order (category `id`).
 

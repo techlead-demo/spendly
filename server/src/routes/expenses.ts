@@ -23,6 +23,14 @@ function isPositiveInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
 }
 
+function parseId(id: string): number {
+  const value = /^[1-9]\d*$/.test(id) ? Number(id) : NaN;
+  if (!Number.isSafeInteger(value)) {
+    throw validationError('id must be a positive integer');
+  }
+  return value;
+}
+
 function parseNewExpense(body: unknown): NewExpense {
   if (typeof body !== 'object' || body === null || Array.isArray(body)) {
     throw validationError('request body must be a JSON object');
@@ -57,6 +65,24 @@ export function expensesRouter(expenses: ExpenseService): Router {
 
   router.post('/', (req, res) => {
     res.status(201).json(expenses.createExpense(parseNewExpense(req.body)));
+  });
+
+  router.get('/:id', (req, res) => {
+    res.json(expenses.getExpense(parseId(req.params.id)));
+  });
+
+  router.put('/:id', (req, res) => {
+    const id = parseId(req.params.id);
+    res.json(expenses.updateExpense(id, parseNewExpense(req.body)));
+  });
+
+  router.delete('/:id', (req, res) => {
+    expenses.deleteExpense(parseId(req.params.id));
+    res.status(204).end();
+  });
+
+  router.post('/:id/restore', (req, res) => {
+    res.json(expenses.restoreExpense(parseId(req.params.id)));
   });
 
   return router;

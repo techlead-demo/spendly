@@ -15,7 +15,7 @@ export interface Expense {
   note: string | null;
 }
 
-/** Body of POST /api/v1/expenses after validation. */
+/** Body of POST /api/v1/expenses and PUT /api/v1/expenses/:id after validation. */
 export type NewExpense = Omit<Expense, 'id'>;
 
 /** Expenses of one category in one month (BR-13). */
