@@ -74,7 +74,8 @@ test.describe('monthly summary (QA)', () => {
     await page.goto('/#/summary');
     const nav = page.getByRole('navigation');
 
-    await expect(page.getByRole('banner')).toHaveText(/^\s*Spendly\s*Expenses\s*Summary\s*$/);
+    // SPD-4 AC-1 adds the "Budgets" link after "Summary".
+    await expect(page.getByRole('banner')).toHaveText(/^\s*Spendly\s*Expenses\s*Summary\s*Budgets\s*$/);
     await expect(nav.getByRole('link', { name: 'Categories' })).toHaveCount(0);
     const active = nav.getByRole('link', { name: 'Summary' });
     await expect(active).toHaveAttribute('aria-current', 'page');

@@ -3,25 +3,26 @@ import type { Expense } from './api/types';
 import styles from './App.module.css';
 import { currentMonth } from './lib/dates';
 import { AddExpensePage } from './pages/AddExpensePage';
+import { BudgetsPage } from './pages/BudgetsPage';
 import { ALL_CATEGORIES, ExpenseListPage, type ExpenseListFilter } from './pages/ExpenseListPage';
 import { SummaryPage } from './pages/SummaryPage';
 
-type Screen = 'expenses' | 'summary';
+type Screen = 'expenses' | 'summary' | 'budgets';
+type View = 'list' | 'add';
 
-// Hash-based navigation: two screens do not justify a router dependency.
+// Hash-based navigation: three screens do not justify a router dependency.
 const SCREENS: { screen: Screen; hash: string; label: string }[] = [
   { screen: 'expenses', hash: '#/', label: 'Expenses' },
   { screen: 'summary', hash: '#/summary', label: 'Summary' },
+  { screen: 'budgets', hash: '#/budgets', label: 'Budgets' },
 ];
 
 function screenFromHash(hash: string): Screen {
-  return hash === '#/summary' ? 'summary' : 'expenses';
+  return SCREENS.find((link) => link.hash === hash)?.screen ?? 'expenses';
 }
 
-type View = 'list' | 'add';
-
 /**
- * The Expenses screen: the list and the Add expense form. It unmounts while the Summary is shown,
+ * The Expenses screen: the list and the Add expense form. It unmounts while another screen is shown,
  * so coming back opens the list on the current month (BR-6).
  */
 function ExpensesScreen() {
@@ -42,6 +43,12 @@ function ExpensesScreen() {
   ) : (
     <AddExpensePage onSaved={handleSaved} onCancel={() => setView('list')} />
   );
+}
+
+function renderScreen(screen: Screen) {
+  if (screen === 'summary') return <SummaryPage />;
+  if (screen === 'budgets') return <BudgetsPage />;
+  return <ExpensesScreen />;
 }
 
 export function App() {
@@ -70,7 +77,7 @@ export function App() {
           ))}
         </nav>
       </header>
-      <main className={styles.main}>{screen === 'summary' ? <SummaryPage /> : <ExpensesScreen />}</main>
+      <main className={styles.main}>{renderScreen(screen)}</main>
     </div>
   );
 }

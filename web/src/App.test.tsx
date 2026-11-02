@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
-import { createExpense, fetchCategories, fetchExpenses, fetchSummary } from './api/client';
+import { createExpense, fetchBudgets, fetchCategories, fetchExpenses, fetchSummary } from './api/client';
 import type { Category, Expense } from './api/types';
 
 vi.mock('./api/client', async (importActual) => ({
@@ -10,6 +10,7 @@ vi.mock('./api/client', async (importActual) => ({
   fetchExpenses: vi.fn(),
   createExpense: vi.fn(),
   fetchSummary: vi.fn(),
+  fetchBudgets: vi.fn(),
 }));
 
 const CATEGORIES: Category[] = [
@@ -45,6 +46,10 @@ describe('App', () => {
     vi.mocked(fetchExpenses).mockResolvedValue({ items: [], monthTotalMinor: 0 });
     vi.mocked(createExpense).mockResolvedValue(saved);
     vi.mocked(fetchSummary).mockResolvedValue({ month: '2026-11', items: [], monthCount: 0, monthTotalMinor: 0 });
+    vi.mocked(fetchBudgets).mockResolvedValue({
+      month: '2026-11',
+      items: CATEGORIES.map((c) => ({ categoryId: c.id, amountMinor: null })),
+    });
   });
 
   afterEach(() => {
@@ -54,12 +59,13 @@ describe('App', () => {
   });
 
   describe('header navigation (SPD-2)', () => {
-    it('AC-1: shows the brand followed by the Expenses and Summary links, with the current one active', async () => {
+    // SPD-4 AC-1 adds the "Budgets" link after "Summary".
+    it('AC-1: shows the brand followed by the Expenses, Summary and Budgets links, with the current one active', async () => {
       render(<App />);
 
       const header = screen.getByRole('banner');
-      expect(header).toHaveTextContent(/^SpendlyExpensesSummary$/);
-      expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(['Expenses', 'Summary']);
+      expect(header).toHaveTextContent(/^SpendlyExpensesSummaryBudgets$/);
+      expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(['Expenses', 'Summary', 'Budgets']);
       expect(screen.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
       expect(screen.getByRole('link', { name: 'Summary' })).not.toHaveAttribute('aria-current');
       expect(await screen.findByText('No expenses for this month.')).toBeInTheDocument();
@@ -90,6 +96,36 @@ describe('App', () => {
 
       await screen.findByRole('option', { name: 'Health' });
       expect(filterControls().month).toHaveValue('2026-11');
+    });
+  });
+
+  describe('budgets (SPD-4)', () => {
+    it('AC-1: the header shows "Spendly" and the links Expenses, Summary, Budgets with the current one active', async () => {
+      await openList();
+
+      const banner = screen.getByRole('banner');
+      expect(banner.firstElementChild).toHaveTextContent('Spendly');
+      const links = screen.getAllByRole('link');
+      expect(links.map((link) => link.textContent)).toEqual(['Expenses', 'Summary', 'Budgets']);
+      expect(screen.getByRole('link', { name: 'Expenses' })).toHaveAttribute('aria-current', 'page');
+      expect(screen.getByRole('link', { name: 'Budgets' })).not.toHaveAttribute('aria-current');
+    });
+
+    it('AC-1, AC-2: "Budgets" opens the Budgets screen on the current month and marks its link active', async () => {
+      await openList();
+      fireEvent.click(screen.getByRole('button', { name: 'Add expense' }));
+
+      navigateTo(screen.getByRole('link', { name: 'Budgets' }).getAttribute('href') ?? '');
+
+      expect(await screen.findByRole('heading', { name: 'Budgets' })).toBeInTheDocument();
+      expect(screen.getByLabelText('Month')).toHaveValue('2026-11');
+      expect(screen.getByRole('link', { name: 'Budgets' })).toHaveAttribute('aria-current', 'page');
+      await screen.findByRole('textbox', { name: 'Food budget' });
+      expect(fetchBudgets).toHaveBeenCalledWith('2026-11');
+
+      navigateTo(screen.getByRole('link', { name: 'Expenses' }).getAttribute('href') ?? '');
+
+      expect(await screen.findByRole('heading', { name: 'Expenses' })).toBeInTheDocument();
     });
   });
 

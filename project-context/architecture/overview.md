@@ -26,8 +26,9 @@ server/src/
 server/test/          Vitest + Supertest tests, helpers.ts
 web/src/
   main.tsx, App.tsx   entry and app shell (header with navigation + page). Hash navigation picks the screen
-                      (`#/` Expenses, `#/summary` Summary); the Expenses screen holds its view (list | add) and the list filter
-  pages/              one component per screen (ExpenseListPage, AddExpensePage, SummaryPage)
+                      (`#/` Expenses, `#/summary` Summary, `#/budgets` Budgets); the Expenses screen holds its view
+                      (list | add) and the list filter
+  pages/              one component per screen (ExpenseListPage, AddExpensePage, SummaryPage, BudgetsPage)
   components/         reusable presentational components (ExpenseTable, SummaryTable)
   api/                client.ts (fetch wrappers, ApiError) and types.ts (API shapes)
   lib/                pure helpers (money, dates, share, expenseForm validation) with co-located tests
@@ -46,5 +47,14 @@ web/src/
 - When the database file did not exist before startup (or is `:memory:`), `index.ts` inserts the sample expenses (`seedSampleExpenses`).
 - There is no migration tool. Schema changes go into `db/schema.ts`; an existing local DB is rebuilt with `npm run db:reset` (see runbook).
 
+## Navigation
+Hash based, no router dependency: `#/` Expenses, `#/summary` Summary, `#/budgets` Budgets. The header links set the
+hash; `App` follows `hashchange`. The Expenses screen switches between the list and the Add expense form with a view
+state; it unmounts while another screen is shown, so coming back opens the list on the current month (BR-6).
+
+## Clock
+`createApp(db, { now })` takes the clock for rules that depend on today (BR-18: budgets only from the current month).
+It defaults to the system clock; server tests pass a fixed date.
+
 ## Not present yet
-No router library (`App.tsx` switches between the Expenses and Summary screens on `location.hash`, and between the list and the Add expense form with a view state), no state library, no auth, no build/deploy pipeline beyond CI.
+No router library (see Navigation), no state library, no auth, no build/deploy pipeline beyond CI.

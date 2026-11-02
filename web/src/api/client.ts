@@ -1,9 +1,11 @@
 import type {
   ApiErrorBody,
+  Budget,
   Category,
   Expense,
   ExpenseListResponse,
   ListResponse,
+  MonthBudgets,
   MonthlySummary,
   NewExpense,
 } from './types';
@@ -59,4 +61,17 @@ export function createExpense(expense: NewExpense): Promise<Expense> {
 
 export function fetchSummary(month: string): Promise<MonthlySummary> {
   return request<MonthlySummary>(`/summary?${new URLSearchParams({ month })}`);
+}
+
+export function fetchBudgets(month: string): Promise<MonthBudgets> {
+  return request<MonthBudgets>(`/budgets?${new URLSearchParams({ month })}`);
+}
+
+/** Sets (amount) or removes (null) the given budgets from `month` onward; resolves to the budgets of `month`. */
+export function saveBudgets(month: string, items: Budget[]): Promise<MonthBudgets> {
+  return request<MonthBudgets>('/budgets', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ month, items }),
+  });
 }
