@@ -1,0 +1,63 @@
+/* Fields of project-context/design/screens/expense-form.html and expense-form-errors.html. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.control {
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.control:focus {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.invalid {
+  border-color: var(--color-danger);
+}
+
+.textarea {
+  height: auto;
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+}
+
+.amount {
+  position: relative;
+}
+
+.suffix {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+}
+
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.fieldError {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}

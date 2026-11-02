@@ -1,6 +1,7 @@
 import type { Category, Expense } from '../api/types';
 import { formatDate } from '../lib/dates';
 import { formatMoney } from '../lib/money';
+import { editExpenseHash } from '../lib/navigation';
 import styles from './ExpenseTable.module.css';
 
 interface ExpenseTableProps {
@@ -25,6 +26,7 @@ export function ExpenseTable({ expenses, categories }: ExpenseTableProps) {
           <th scope="col" className={styles.amount}>
             Amount
           </th>
+          <th scope="col" className={styles.action} />
         </tr>
       </thead>
       <tbody>
@@ -34,6 +36,11 @@ export function ExpenseTable({ expenses, categories }: ExpenseTableProps) {
             <td>{categoryNames.get(expense.categoryId) ?? '—'}</td>
             <td className={styles.note}>{expense.note ?? ''}</td>
             <td className={styles.amount}>{formatMoney(expense.amountMinor)}</td>
+            <td className={styles.action}>
+              <a className={styles.link} href={editExpenseHash(expense.id)}>
+                Edit
+              </a>
+            </td>
           </tr>
         ))}
       </tbody>

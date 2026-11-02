@@ -31,6 +31,25 @@
   white-space: nowrap;
 }
 
+.action {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
 .note {
   color: var(--color-text-muted);
 }

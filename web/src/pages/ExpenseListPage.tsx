@@ -18,9 +18,11 @@ interface ExpenseListPageProps {
   filter: ExpenseListFilter;
   onFilterChange: (filter: ExpenseListFilter) => void;
   onAddExpense: () => void;
+  /** Changing it reloads the list (e.g. after an Undo restored an expense). */
+  reloadKey?: number;
 }
 
-export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: ExpenseListPageProps) {
+export function ExpenseListPage({ filter, onFilterChange, onAddExpense, reloadKey = 0 }: ExpenseListPageProps) {
   const { month, categoryId } = filter;
   const [categories, setCategories] = useState<Category[]>([]);
   const [list, setList] = useState<ExpenseListResponse | null>(null);
@@ -46,7 +48,7 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
     return () => {
       cancelled = true;
     };
-  }, [month, categoryId]);
+  }, [month, categoryId, reloadKey]);
 
   return (
     <section>

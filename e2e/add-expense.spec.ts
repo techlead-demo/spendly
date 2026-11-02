@@ -47,7 +47,7 @@ test.describe('add expense', () => {
     await expect(page.getByRole('heading', { name: 'Expenses' })).toBeVisible();
     await expect(page.getByLabel('Month')).toHaveValue('2026-11');
     await expect(rowWith(page, note)).toBeVisible();
-    expect(await rowCells(page, note)).toEqual(['02/11/2026', 'Food', note, '85.000 ₫']);
+    expect(await rowCells(page, note)).toEqual(['02/11/2026', 'Food', note, '85.000 ₫', 'Edit']);
     await expect
       .poll(async () => moneyToNumber(await page.getByTestId('month-total').innerText()))
       .toBe(totalBefore + 85_000);
@@ -79,7 +79,7 @@ test.describe('add expense', () => {
 
     await expect(page.getByLabel('Month')).toHaveValue('2026-12');
     await expect(rowWith(page, note)).toBeVisible();
-    expect(await rowCells(page, note)).toEqual(['24/12/2026', 'Other', note, '500.000 ₫']);
+    expect(await rowCells(page, note)).toEqual(['24/12/2026', 'Other', note, '500.000 ₫', 'Edit']);
   });
 
   test('AC-11: Cancel stores nothing and keeps the previous month and category', async ({ page }) => {
@@ -120,7 +120,7 @@ test.describe('add expense', () => {
 
     await expect(page.getByRole('alert')).toHaveCount(0);
     await expect(page.getByLabel('Month')).toHaveValue('2026-10');
-    expect(await rowCells(page, note)).toEqual(['20/10/2026', 'Entertainment', note, '1 ₫']);
+    expect(await rowCells(page, note)).toEqual(['20/10/2026', 'Entertainment', note, '1 ₫', 'Edit']);
   });
 
   test('AC-16: the note accepts at most 200 characters', async ({ page }) => {

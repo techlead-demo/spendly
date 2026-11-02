@@ -26,12 +26,15 @@ server/src/
 server/test/          Vitest + Supertest tests, helpers.ts
 web/src/
   main.tsx, App.tsx   entry and app shell (header with navigation + page). Hash navigation picks the screen
-                      (`#/` Expenses, `#/summary` Summary, `#/budgets` Budgets); the Expenses screen holds its view
-                      (list | add) and the list filter
-  pages/              one component per screen (ExpenseListPage, AddExpensePage, SummaryPage, BudgetsPage)
-  components/         reusable presentational components (ExpenseTable, SummaryTable)
+                      (`#/` Expenses, `#/summary` Summary, `#/budgets` Budgets, `#/expenses/<id>/edit` Edit
+                      expense); the Expenses screen holds its view (list | add), the list filter and the undo toast
+  pages/              one component per screen (ExpenseListPage, AddExpensePage, EditExpensePage, SummaryPage,
+                      BudgetsPage)
+  components/         reusable presentational components (ExpenseTable, ExpenseFormFields, DeleteExpenseDialog,
+                      UndoToast, SummaryTable)
   api/                client.ts (fetch wrappers, ApiError) and types.ts (API shapes)
-  lib/                pure helpers (money, dates, share, expenseForm validation) with co-located tests
+  lib/                pure helpers (money, dates, share, expenseForm validation, navigation hashes) with
+                      co-located tests
   styles/global.css   imports project-context/design/tokens.css, base element styles
 ```
 
@@ -51,6 +54,11 @@ web/src/
 Hash based, no router dependency: `#/` Expenses, `#/summary` Summary, `#/budgets` Budgets. The header links set the
 hash; `App` follows `hashchange`. The Expenses screen switches between the list and the Add expense form with a view
 state; it unmounts while another screen is shown, so coming back opens the list on the current month (BR-6).
+
+The Edit expense form has its own hash `#/expenses/<id>/edit` (`lib/navigation.ts`), so a reload or a stale link
+shows the "no longer exists" state. It belongs to the Expenses screen, so Cancel and Delete return to the list
+with the filter it had. After a delete the Expenses screen shows the "Expense deleted." toast with Undo for
+5 seconds; it closes when the user leaves the list.
 
 ## Clock
 `createApp(db, { now })` takes the clock for rules that depend on today (BR-18: budgets only from the current month).
