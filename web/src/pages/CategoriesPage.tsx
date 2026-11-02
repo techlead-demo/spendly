@@ -198,7 +198,12 @@ export function CategoriesPage() {
                     </span>
                   </td>
                   <td className={styles.num}>
-                    <button type="button" className={styles.link} onClick={() => startRename(category)}>
+                    <button
+                      type="button"
+                      className={styles.link}
+                      disabled={busy}
+                      onClick={() => startRename(category)}
+                    >
                       Rename
                     </button>
                     {' · '}

@@ -235,6 +235,21 @@ describe('CategoriesPage', () => {
       expect(screen.queryByRole('textbox', { name: 'Category name' })).not.toBeInTheDocument();
     });
 
+    it('AC-13: while a rename is saved, Rename and Retire on the other rows are disabled', async () => {
+      let finish: (category: Category) => void = () => {};
+      vi.mocked(renameCategory).mockReturnValue(new Promise((resolve) => (finish = resolve)));
+      await openPage();
+      fireEvent.change(startRename('Food'), { target: { value: 'Groceries' } });
+
+      fireEvent.click(within(renamingRow()).getByRole('button', { name: 'Save' }));
+
+      expect(within(row('Transport')).getByRole('button', { name: 'Rename' })).toBeDisabled();
+      expect(within(row('Transport')).getByRole('button', { name: 'Retire' })).toBeDisabled();
+      finish(update(1, { name: 'Groceries' }));
+      await waitFor(() => expect(within(row('Transport')).getByRole('button', { name: 'Rename' })).toBeEnabled());
+      expect(screen.queryByRole('textbox', { name: 'Category name' })).not.toBeInTheDocument();
+    });
+
     it('AC-13: Enter saves the new name', async () => {
       await openPage();
       const input = startRename('Food');

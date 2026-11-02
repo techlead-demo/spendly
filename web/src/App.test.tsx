@@ -78,7 +78,7 @@ describe('App', () => {
 
   describe('header navigation (SPD-2)', () => {
     // SPD-4 AC-1 adds the "Budgets" link after "Summary"; SPD-6 AC-1 adds "Categories" last.
-    it('AC-1: shows the brand followed by the Expenses, Summary and Budgets links, with the current one active', async () => {
+    it('AC-1: shows the brand followed by the Expenses, Summary, Budgets and Categories links, with the current one active', async () => {
       render(<App />);
 
       const header = screen.getByRole('banner');
@@ -123,7 +123,7 @@ describe('App', () => {
   });
 
   describe('budgets (SPD-4)', () => {
-    it('AC-1: the header shows "Spendly" and the links Expenses, Summary, Budgets with the current one active', async () => {
+    it('AC-1: the header shows "Spendly" and the links Expenses, Summary, Budgets, Categories with the current one active', async () => {
       await openList();
 
       const banner = screen.getByRole('banner');
