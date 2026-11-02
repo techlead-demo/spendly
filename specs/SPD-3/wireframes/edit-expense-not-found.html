@@ -1,0 +1,46 @@
+<!doctype html>
+<!-- Wireframe for SPD-3: Edit expense when the expense does not exist (deleted or unknown id). App shell and styles copied from project-context/design/screens/expense-form-edit.html; the data is illustrative. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spendly wireframe: Edit expense, not found</title>
+  <link rel="stylesheet" href="../../../project-context/design/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family); font-size: var(--font-size-md); line-height: var(--line-height); color: var(--color-text); background: var(--color-bg); }
+    button, input, select, textarea { font: inherit; }
+    .header { display: flex; align-items: center; gap: var(--space-6); height: var(--header-height); padding: 0 var(--space-6); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .brand { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-primary); }
+    .nav { display: flex; gap: var(--space-4); }
+    .nav a { color: var(--color-text-muted); text-decoration: none; padding: var(--space-2) 0; }
+    .nav a.active { color: var(--color-text); font-weight: var(--font-weight-medium); border-bottom: 2px solid var(--color-primary); }
+    .main { max-width: var(--content-max-width); margin: 0 auto; padding: var(--space-6); }
+    .titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    h1 { margin: 0; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .link { color: var(--color-primary); text-decoration: none; background: none; border: none; padding: 0; cursor: pointer; }
+    .card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-6); }
+    .banner { display: flex; gap: var(--space-3); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); border-radius: var(--radius-sm); border: 1px solid; }
+    .banner.error { color: var(--color-danger); background: var(--color-danger-bg); border-color: var(--color-danger); }
+    .mockupNote { max-width: var(--content-max-width); margin: 0 auto; padding: 0 var(--space-6) var(--space-6); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <span class="brand">Spendly</span>
+    <nav class="nav">
+      <a href="#" class="active">Expenses</a>
+      <a href="#">Summary</a>
+      <a href="#">Budgets</a>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="titleRow"><h1>Edit expense</h1></div>
+    <div class="card">
+      <div class="banner error" role="alert">This expense no longer exists.</div>
+      <a class="link" href="#">Back to expenses</a>
+    </div>
+  </main>
+  <p class="mockupNote">Wireframe (SPD-3). Shown when the Edit expense screen is opened for an expense that does not exist (the API answers 404). No form and no Delete button are shown. "Back to expenses" opens the expense list on the current month with "All categories". Loading: "Loading…" in the card instead of the form. Other load errors: the same layout with "Could not load the expense. Try again."</p>
+</body>
+</html>
