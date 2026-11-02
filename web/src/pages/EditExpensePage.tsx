@@ -10,6 +10,7 @@ import {
 import type { Category, Expense } from '../api/types';
 import { DeleteExpenseDialog } from '../components/DeleteExpenseDialog';
 import { ExpenseFormFields, type ExpenseFieldRefs } from '../components/ExpenseFormFields';
+import { selectableCategories } from '../lib/categories';
 import { formatDate } from '../lib/dates';
 import {
   FIX_FIELDS_MESSAGE,
@@ -87,7 +88,8 @@ export function EditExpensePage({ expenseId, onSaved, onCancel, onDeleted, onBac
       .then(([expense, items]) => {
         if (cancelled) return;
         setStored(expense);
-        setCategories(items);
+        // BR-24: active categories, plus the expense's own category if it is retired.
+        setCategories(selectableCategories(items, expense.categoryId));
         setValues(expenseToFormValues(expense));
         setLoadState('ready');
       })

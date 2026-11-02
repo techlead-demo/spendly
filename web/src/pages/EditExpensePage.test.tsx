@@ -13,12 +13,12 @@ vi.mock('../api/client', async (importActual) => ({
 }));
 
 const CATEGORIES: Category[] = [
-  { id: 1, name: 'Food' },
-  { id: 2, name: 'Transport' },
-  { id: 3, name: 'Housing' },
-  { id: 4, name: 'Health' },
-  { id: 5, name: 'Entertainment' },
-  { id: 6, name: 'Other' },
+  { id: 1, name: 'Food', status: 'active', expenseCount: 0 },
+  { id: 2, name: 'Transport', status: 'active', expenseCount: 0 },
+  { id: 3, name: 'Housing', status: 'active', expenseCount: 0 },
+  { id: 4, name: 'Health', status: 'active', expenseCount: 0 },
+  { id: 5, name: 'Entertainment', status: 'active', expenseCount: 0 },
+  { id: 6, name: 'Other', status: 'active', expenseCount: 0 },
 ];
 
 const E: Expense = { id: 7, date: '2026-11-02', amountMinor: 280_000, categoryId: 1, note: 'Groceries at Co.opmart' };
@@ -459,6 +459,51 @@ describe('EditExpensePage', () => {
       expect(await screen.findByRole('alert')).toHaveTextContent('Could not load the expense. Try again.');
       expect(screen.getByRole('link', { name: 'Back to expenses' })).toBeInTheDocument();
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('retired categories (SPD-6)', () => {
+    const G: Expense = { id: 30, date: '2026-10-15', amountMinor: 120_000, categoryId: 8, note: null };
+    const WITH_RETIRED: Category[] = [
+      ...CATEGORIES,
+      { id: 7, name: 'Coffee', status: 'retired', expenseCount: 0 },
+      { id: 8, name: 'Gym', status: 'retired', expenseCount: 6 },
+    ];
+
+    function optionNames() {
+      return within(field('Category')).getAllByRole('option').map((option) => option.textContent);
+    }
+
+    beforeEach(() => {
+      vi.mocked(fetchCategories).mockResolvedValue(WITH_RETIRED);
+    });
+
+    it("AC-37: shows the expense's retired category selected and last, and keeps it on Save", async () => {
+      const { onSaved } = await renderLoaded(G);
+
+      expect(field('Category')).toHaveDisplayValue('Gym');
+      expect(optionNames()).toEqual([
+        'Choose a category',
+        'Food',
+        'Transport',
+        'Housing',
+        'Health',
+        'Entertainment',
+        'Other',
+        'Gym',
+      ]);
+      setField('Amount', '150000');
+      fireEvent.click(button('Save'));
+
+      await waitFor(() => expect(onSaved).toHaveBeenCalled());
+      expect(updateExpense).toHaveBeenCalledWith(30, { date: '2026-10-15', amountMinor: 150_000, categoryId: 8, note: null });
+    });
+
+    it('AC-37: an expense in an active category is not offered any retired category', async () => {
+      await renderLoaded({ ...G, categoryId: 1 });
+
+      expect(optionNames()).not.toContain('Gym');
+      expect(optionNames()).not.toContain('Coffee');
     });
   });
 });

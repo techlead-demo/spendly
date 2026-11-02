@@ -4,8 +4,8 @@ import type { Category, Expense } from '../api/types';
 import { ExpenseTable } from './ExpenseTable';
 
 const categories: Category[] = [
-  { id: 1, name: 'Food' },
-  { id: 2, name: 'Transport' },
+  { id: 1, name: 'Food', status: 'active', expenseCount: 1 },
+  { id: 2, name: 'Transport', status: 'active', expenseCount: 1 },
 ];
 
 const expenses: Expense[] = [

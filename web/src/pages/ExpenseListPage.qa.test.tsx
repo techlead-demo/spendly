@@ -18,12 +18,12 @@ vi.mock('../api/client', async (importActual) => ({
 const normalize = (s: string | null) => (s ?? '').replace(/\s/g, ' ');
 
 const CATEGORIES: Category[] = [
-  { id: 1, name: 'Food' },
-  { id: 2, name: 'Transport' },
-  { id: 3, name: 'Housing' },
-  { id: 4, name: 'Health' },
-  { id: 5, name: 'Entertainment' },
-  { id: 6, name: 'Other' },
+  { id: 1, name: 'Food', status: 'active', expenseCount: 0 },
+  { id: 2, name: 'Transport', status: 'active', expenseCount: 0 },
+  { id: 3, name: 'Housing', status: 'active', expenseCount: 0 },
+  { id: 4, name: 'Health', status: 'active', expenseCount: 0 },
+  { id: 5, name: 'Entertainment', status: 'active', expenseCount: 0 },
+  { id: 6, name: 'Other', status: 'active', expenseCount: 0 },
 ];
 
 const LIST: ExpenseListResponse = {

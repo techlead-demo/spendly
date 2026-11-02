@@ -1,8 +1,14 @@
 /** Shapes of the API under /api/v1 (see project-context/architecture/api.md). */
 
+/** BR-24: only active categories can be chosen for new expenses and get budgets. */
+export type CategoryStatus = 'active' | 'retired';
+
 export interface Category {
   id: number;
   name: string;
+  status: CategoryStatus;
+  /** Number of expenses over all months; deleted expenses are not counted. */
+  expenseCount: number;
 }
 
 export interface Expense {

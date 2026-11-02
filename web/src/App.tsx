@@ -7,21 +7,23 @@ import { currentMonth } from './lib/dates';
 import { EXPENSES_HASH, parseEditExpenseHash } from './lib/navigation';
 import { AddExpensePage } from './pages/AddExpensePage';
 import { BudgetsPage } from './pages/BudgetsPage';
+import { CategoriesPage } from './pages/CategoriesPage';
 import { EditExpensePage } from './pages/EditExpensePage';
 import { ALL_CATEGORIES, ExpenseListPage, type ExpenseListFilter } from './pages/ExpenseListPage';
 import { SummaryPage } from './pages/SummaryPage';
 
-type Screen = 'expenses' | 'summary' | 'budgets';
+type Screen = 'expenses' | 'summary' | 'budgets' | 'categories';
 type View = 'list' | 'add';
 
 /** BR-21: how long the "Expense deleted." toast offers Undo, and how long a restore error stays. */
 const UNDO_TOAST_MS = 5000;
 
-// Hash-based navigation: three screens do not justify a router dependency.
+// Hash-based navigation: four screens do not justify a router dependency.
 const SCREENS: { screen: Screen; hash: string; label: string }[] = [
   { screen: 'expenses', hash: EXPENSES_HASH, label: 'Expenses' },
   { screen: 'summary', hash: '#/summary', label: 'Summary' },
   { screen: 'budgets', hash: '#/budgets', label: 'Budgets' },
+  { screen: 'categories', hash: '#/categories', label: 'Categories' },
 ];
 
 function screenFromHash(hash: string): Screen {
@@ -146,6 +148,7 @@ function renderScreen(hash: string, navigate: (hash: string) => void) {
   const screen = screenFromHash(hash);
   if (screen === 'summary') return <SummaryPage />;
   if (screen === 'budgets') return <BudgetsPage />;
+  if (screen === 'categories') return <CategoriesPage />;
   return <ExpensesScreen editId={parseEditExpenseHash(hash)} navigate={navigate} />;
 }
 
