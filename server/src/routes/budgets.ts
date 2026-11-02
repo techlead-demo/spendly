@@ -59,6 +59,10 @@ export function budgetsRouter(budgets: BudgetService): Router {
     res.json(budgets.getBudgets(parseMonth(req.query.month)));
   });
 
+  router.get('/over', (req, res) => {
+    res.json(budgets.getOverBudget(parseMonth(req.query.month)));
+  });
+
   router.put('/', (req, res) => {
     res.json(budgets.setBudgets(parseBudgetChange(req.body)));
   });
