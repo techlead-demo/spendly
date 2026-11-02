@@ -1,0 +1,81 @@
+<!doctype html>
+<!-- Wireframe for SPD-3: Expense list right after an expense was deleted, with the undo toast. App shell and styles copied from project-context/design/screens/expense-list.html; the data is illustrative. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spendly wireframe: Expense list, undo toast</title>
+  <link rel="stylesheet" href="../../../project-context/design/tokens.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font-family); font-size: var(--font-size-md); line-height: var(--line-height); color: var(--color-text); background: var(--color-bg); }
+    button, input, select, textarea { font: inherit; }
+    .header { display: flex; align-items: center; gap: var(--space-6); height: var(--header-height); padding: 0 var(--space-6); background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .brand { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-primary); }
+    .nav { display: flex; gap: var(--space-4); }
+    .nav a { color: var(--color-text-muted); text-decoration: none; padding: var(--space-2) 0; }
+    .nav a.active { color: var(--color-text); font-weight: var(--font-weight-medium); border-bottom: 2px solid var(--color-primary); }
+    .main { max-width: var(--content-max-width); margin: 0 auto; padding: var(--space-6); }
+    .titleRow { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+    h1 { margin: 0; font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .field { display: flex; flex-direction: column; gap: var(--space-1); }
+    .label { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .control { height: var(--control-height); padding: 0 var(--space-3); color: var(--color-text); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); }
+    .button { height: var(--control-height); padding: 0 var(--space-4); border-radius: var(--radius-sm); border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+    .button.primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); }
+    .link { color: var(--color-primary); text-decoration: none; background: none; border: none; padding: 0; cursor: pointer; }
+    .table { width: 100%; border-collapse: collapse; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .table th, .table td { padding: var(--space-3) var(--space-4); text-align: left; border-bottom: 1px solid var(--color-border); }
+    .table th { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); color: var(--color-text-muted); background: var(--color-surface-muted); }
+    .table tbody tr:last-child td { border-bottom: none; }
+    .num { text-align: right !important; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .muted { color: var(--color-text-muted); }
+    .total { display: flex; justify-content: flex-end; gap: var(--space-4); padding: var(--space-4); font-size: var(--font-size-lg); }
+    .total strong { font-variant-numeric: tabular-nums; }
+    .mockupNote { max-width: var(--content-max-width); margin: 0 auto; padding: 0 var(--space-6) var(--space-6); font-size: var(--font-size-sm); color: var(--color-text-muted); }
+    .toast { position: fixed; left: 50%; bottom: var(--space-6); transform: translateX(-50%); display: flex; align-items: center; gap: var(--space-4); min-width: 280px; padding: var(--space-3) var(--space-4); background: var(--color-surface); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); }
+    .toast .link { font-weight: var(--font-weight-medium); margin-left: auto; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <span class="brand">Spendly</span>
+    <nav class="nav">
+      <a href="#" class="active">Expenses</a>
+      <a href="#">Summary</a>
+      <a href="#">Budgets</a>
+    </nav>
+  </header>
+  <main class="main">
+    <div class="titleRow">
+      <h1>Expenses</h1>
+      <a class="button primary" href="#" style="display:inline-flex;align-items:center;text-decoration:none">Add expense</a>
+    </div>
+
+    <div class="toolbar">
+      <label class="field"><span class="label">Month</span><input class="control" type="month" value="2026-11" /></label>
+      <label class="field"><span class="label">Category</span>
+        <select class="control"><option>All categories</option><option selected>Food</option><option>Transport</option><option>Housing</option><option>Health</option><option>Entertainment</option><option>Other</option></select>
+      </label>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr><th>Date</th><th>Category</th><th>Note</th><th class="num">Amount</th><th class="num"></th></tr>
+      </thead>
+      <tbody>
+        <tr><td>15/11/2026</td><td>Food</td><td class="muted">Groceries</td><td class="num">380.000 ₫</td><td class="num"><a class="link" href="#">Edit</a></td></tr>
+        <tr><td>06/11/2026</td><td>Food</td><td class="muted">Pho with friends</td><td class="num">95.000 ₫</td><td class="num"><a class="link" href="#">Edit</a></td></tr>
+        <tr><td>03/11/2026</td><td>Food</td><td class="muted">Coffee</td><td class="num">30.000 ₫</td><td class="num"><a class="link" href="#">Edit</a></td></tr>
+      </tbody>
+    </table>
+    <div class="total"><span>Month total</span><strong>505.000 ₫</strong></div>
+  </main>
+  <p class="mockupNote">Wireframe (SPD-3). Shown here: the expense list (November 2026, Food) right after "02/11/2026 · Food · Groceries at Co.opmart · 280.000 ₫" was deleted. The toast closes after 5 seconds, when "Undo" succeeds, or when the user leaves the list or reloads; the timer does not pause on hover or focus. "Undo" restores the expense: its row returns in its previous position and the month total goes back to 785.000 ₫, with the month and filter unchanged. While the restore request runs, "Undo" is disabled and the toast stays open. If the restore fails, the toast text becomes "Could not restore the expense." without "Undo" and closes after 5 seconds. Empty month after a delete: the table is replaced by "No expenses for this month.", month total 0 ₫, with the same toast.</p>
+  <div class="toast" role="status" aria-live="polite">
+    <span>Expense deleted.</span>
+    <button class="link" type="button">Undo</button>
+  </div>
+</body>
+</html>
