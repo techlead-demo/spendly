@@ -14,4 +14,5 @@
 - **Month total**: the total amount spent in the selected month, shown under the expense list.
 - **Monthly summary**: the screen showing a month's spending grouped by category, with the number of expenses and the total per category and the month total.
 - **Category total**: the total amount spent in one category in the selected month, shown in the monthly summary.
+- **Share**: a category total as a percentage of the month total, shown in the monthly summary (e.g. `95,5%`).
 - **Sample data**: the expenses a new database is created with, so the app is not empty on first use.

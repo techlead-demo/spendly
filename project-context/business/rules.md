@@ -17,3 +17,4 @@ Specs, tests and reviews refer to them by ID.
 - **BR-12** When an expense is recorded, its date defaults to today's local date; any valid calendar date, past or future, is accepted.
 - **BR-13** The monthly summary groups a month's expenses by category: one row per category with at least one expense that month, showing the number of expenses and their total. Rows are ordered by total, largest first; equal totals follow the fixed category order. The month total is the sum of all rows and equals the expense list's month total for all categories.
 - **BR-14** The monthly summary shows one month at a time; it opens on the current month.
+- **BR-15** In the monthly summary, a category's share is its category total divided by the month total, as a percentage, rounded half up to one decimal place and shown in `vi-VN` format, e.g. `95,5%`. The footer shows `100,0%`. Rounded row shares are not adjusted to add up to 100,0%.
