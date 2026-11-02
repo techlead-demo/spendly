@@ -1,7 +1,14 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
-import { createExpense, fetchBudgets, fetchCategories, fetchExpenses, fetchSummary } from './api/client';
+import {
+  createExpense,
+  fetchBudgets,
+  fetchCategories,
+  fetchExpenses,
+  fetchOverBudget,
+  fetchSummary,
+} from './api/client';
 import type { Category, Expense } from './api/types';
 
 vi.mock('./api/client', async (importActual) => ({
@@ -11,6 +18,7 @@ vi.mock('./api/client', async (importActual) => ({
   createExpense: vi.fn(),
   fetchSummary: vi.fn(),
   fetchBudgets: vi.fn(),
+  fetchOverBudget: vi.fn(),
 }));
 
 const CATEGORIES: Category[] = [
@@ -46,6 +54,7 @@ describe('App', () => {
     vi.mocked(fetchExpenses).mockResolvedValue({ items: [], monthTotalMinor: 0 });
     vi.mocked(createExpense).mockResolvedValue(saved);
     vi.mocked(fetchSummary).mockResolvedValue({ month: '2026-11', items: [], monthCount: 0, monthTotalMinor: 0 });
+    vi.mocked(fetchOverBudget).mockResolvedValue({ month: '2026-11', items: [] });
     vi.mocked(fetchBudgets).mockResolvedValue({
       month: '2026-11',
       items: CATEGORIES.map((c) => ({ categoryId: c.id, amountMinor: null })),

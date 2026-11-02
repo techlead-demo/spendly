@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { fetchCategories, fetchExpenses } from '../api/client';
-import type { Category, ExpenseListResponse } from '../api/types';
+import { fetchCategories, fetchExpenses, fetchOverBudget } from '../api/client';
+import type { Category, ExpenseListResponse, MonthOverBudget } from '../api/types';
 import { ExpenseTable } from '../components/ExpenseTable';
+import { OverBudgetBanner } from '../components/OverBudgetBanner';
+import { currentMonth } from '../lib/dates';
 import { formatMoney } from '../lib/money';
 import styles from './ExpenseListPage.module.css';
 
@@ -25,6 +27,7 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
   const [categories, setCategories] = useState<Category[]>([]);
   const [list, setList] = useState<ExpenseListResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [overBudget, setOverBudget] = useState<MonthOverBudget | null>(null);
 
   useEffect(() => {
     fetchCategories()
@@ -48,6 +51,24 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
     };
   }, [month, categoryId]);
 
+  // The banner covers the whole month whatever the category filter (BR-8, SPD-5 AC-12). It is extra
+  // information: while it loads or when it fails, the list is shown without it and without an error.
+  useEffect(() => {
+    if (!month) return;
+    let cancelled = false;
+    setOverBudget(null);
+    fetchOverBudget(month)
+      .then((data) => {
+        if (!cancelled) setOverBudget(data);
+      })
+      .catch(() => {
+        if (!cancelled) setOverBudget(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [month]);
+
   return (
     <section>
       <div className={styles.titleRow}>
@@ -56,6 +77,8 @@ export function ExpenseListPage({ filter, onFilterChange, onAddExpense }: Expens
           Add expense
         </button>
       </div>
+
+      {overBudget && <OverBudgetBanner overBudget={overBudget} currentMonth={currentMonth()} />}
 
       <div className={styles.toolbar}>
         <label className={styles.field}>
