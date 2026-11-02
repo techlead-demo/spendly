@@ -21,9 +21,13 @@ export function BudgetsPage() {
   const [invalid, setInvalid] = useState<number[]>([]);
   const [banner, setBanner] = useState<string | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
+  // Kept apart from loadFailed: categories are loaded once, so a month change must not hide their error (AC-22).
+  const [categoriesFailed, setCategoriesFailed] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const inputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  // Incremented on every month load, so a save that finishes after a month change is ignored.
+  const loadId = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,7 +36,7 @@ export function BudgetsPage() {
         if (!cancelled) setCategories(items);
       })
       .catch(() => {
-        if (!cancelled) setLoadFailed(true);
+        if (!cancelled) setCategoriesFailed(true);
       });
     return () => {
       cancelled = true;
@@ -43,6 +47,7 @@ export function BudgetsPage() {
     // A cleared Month picker keeps the budgets on screen (AC-20).
     if (!month) return;
     let cancelled = false;
+    loadId.current += 1;
     // Changing the month discards unsaved edits (AC-19).
     setBudgets(null);
     setLoadFailed(false);
@@ -91,12 +96,15 @@ export function BudgetsPage() {
       return;
     }
     setSaving(true);
+    const saveLoadId = loadId.current;
     try {
       const data = await saveBudgets(budgets.month, result.changes);
+      if (loadId.current !== saveLoadId) return;
       setBudgets(data);
       setValues(toBudgetFormValues(data.items));
       setSaved(true);
     } catch (e) {
+      if (loadId.current !== saveLoadId) return;
       // The edits stay in the fields (AC-23).
       setBanner(e instanceof ApiError && e.status === 400 ? e.message : SAVE_FAILED_MESSAGE);
       setSaved(false);
@@ -110,7 +118,7 @@ export function BudgetsPage() {
   }
 
   function renderContent() {
-    if (loadFailed) {
+    if (loadFailed || categoriesFailed) {
       return (
         <p role="alert" className={styles.error}>
           {LOAD_FAILED_MESSAGE}

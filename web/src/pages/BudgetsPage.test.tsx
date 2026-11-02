@@ -314,6 +314,33 @@ describe('BudgetsPage', () => {
     expect(saveBudgets).not.toHaveBeenCalled();
   });
 
+  it('AC-19: a save that finishes after a month change does not replace the new month', async () => {
+    byMonth['2026-12'] = { [FOOD]: 900_000 };
+    let finishSave: (data: MonthBudgets) => void = () => {};
+    vi.mocked(saveBudgets).mockReturnValue(
+      new Promise((resolve) => {
+        finishSave = resolve;
+      }),
+    );
+    await openPage();
+    type('Food', '700000');
+    clickSave();
+
+    fireEvent.change(monthPicker(), { target: { value: '2026-12' } });
+    await waitFor(() => expect(field('Food')).toHaveValue('900000'));
+    finishSave(monthBudgets('2026-11', { [FOOD]: 700_000 }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled());
+    expect(field('Food')).toHaveValue('900000');
+    expect(screen.queryByText('Budgets saved.')).not.toBeInTheDocument();
+
+    vi.mocked(saveBudgets).mockResolvedValue(monthBudgets('2026-12', { [FOOD]: 950_000 }));
+    type('Food', '950000');
+    clickSave();
+    expect(await screen.findByText('Budgets saved.')).toBeInTheDocument();
+    expect(saveBudgets).toHaveBeenLastCalledWith('2026-12', [{ categoryId: FOOD, amountMinor: 950_000 }]);
+  });
+
   it('AC-20: clearing the Month picker keeps the budgets on screen and sends no request', async () => {
     byMonth['2026-11'] = { [FOOD]: 700_000 };
     await openPage();
@@ -350,6 +377,19 @@ describe('BudgetsPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not load the budgets. Try again.');
     expect(screen.queryByText('Loading…')).not.toBeInTheDocument();
+  });
+
+  it('AC-22: keeps the load error after a month change when the categories failed to load', async () => {
+    vi.mocked(fetchCategories).mockRejectedValue(new TypeError('Failed to fetch'));
+    render(<BudgetsPage />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not load the budgets. Try again.');
+
+    fireEvent.change(monthPicker(), { target: { value: '2026-12' } });
+
+    await waitFor(() => expect(fetchBudgets).toHaveBeenCalledWith('2026-12'));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not load the budgets. Try again.');
+    expect(screen.queryByText('Loading…')).not.toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   it('AC-23: shows the save error above the table and keeps the edits', async () => {

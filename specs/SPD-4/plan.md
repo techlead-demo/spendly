@@ -64,3 +64,10 @@ documented in `project-context/architecture/data-model.md`. Expenses and categor
 - e2e tests share one in-memory database; the budgets journey uses months several years ahead so it does not
   depend on today's date or on other tests.
 - No new dependency.
+
+## Revision 2
+| Feedback item | Resolution |
+|---|---|
+| AI review: a save that finishes after a month change can overwrite the new month's data (`BudgetsPage.tsx` line 96) | Fixed. Each month load increments a `loadId` ref; the save keeps the id it started with and ignores its response or error if the id changed. Test: "AC-19: a save that finishes after a month change does not replace the new month". |
+| AI review: after a failed categories load, changing the month leaves the page on "Loading…" (`BudgetsPage.tsx` line 48) | Fixed. The categories error is kept in its own `categoriesFailed` state, which a month change does not reset, so the load error stays (AC-22). Test: "AC-22: keeps the load error after a month change when the categories failed to load". |
+| Human reviewer: "Need to fix these minors" | Fixed by the two items above. |
