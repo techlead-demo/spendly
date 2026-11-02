@@ -13,3 +13,5 @@ Specs, tests and reviews refer to them by ID.
 - **BR-8** The expense list can be filtered by one category or show all categories (default: all).
 - **BR-9** Amounts are displayed in VND with `vi-VN` formatting, e.g. `6.500.000 ₫`.
 - **BR-10** There is one user and no login.
+- **BR-11** A note is at most 200 characters. Leading and trailing spaces are removed; a note that is empty after that is stored as no note.
+- **BR-12** When an expense is recorded, its date defaults to today's local date; any valid calendar date, past or future, is accepted.
